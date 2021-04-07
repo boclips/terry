@@ -15,21 +15,6 @@ import org.springframework.context.annotation.Profile
 @Configuration
 class VideoClientConfig {
     @Bean
-    fun channelsClient(properties: VideoServiceClientProperties, tracer: Tracer): ChannelsClient {
-        return ChannelsClient.create(
-            apiUrl = properties.baseUrl,
-            tokenFactory = ServiceAccountTokenFactory(
-                ServiceAccountCredentials(
-                    authEndpoint = properties.baseUrl,
-                    clientId = properties.clientId,
-                    clientSecret = properties.clientSecret
-                )
-            ),
-            feignClient = TracingClient(OkHttpClient(), tracer)
-        )
-    }
-
-    @Bean
     fun videosClient(properties: VideoServiceClientProperties, tracer: Tracer): VideosClient {
         return VideosClient.create(
             apiUrl = properties.baseUrl,
