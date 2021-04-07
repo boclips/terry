@@ -1,0 +1,48 @@
+---
+platform: linux
+
+image_resource:
+  type: registry-image
+  source:
+    repository: springci/spring-boot-jdk11-ci-image
+    tag: 2.4.x
+
+inputs:
+- name: source
+- name: version
+
+outputs:
+- name: image
+
+caches:
+- path: .gradle/
+- path: source/m2
+
+params:
+  SLACK_BOT_TOKEN:
+
+run:
+  path: bash
+  args:
+  - -c
+  - |-
+    set -e
+
+    GRADLE_USER_HOME="$(pwd)/.gradle"
+    export GRADLE_USER_HOME
+
+    version=$(cat version/tag)
+
+    cd source
+
+    # link to docker cache we specified under 'caches'
+    rm -rf ~/.m2
+    ln -fs $(pwd)/m2 ~/.m2
+
+    source /docker-lib.sh
+    start_docker
+
+    ./gradlew -Pversion="$version" test bootBuildImage --no-daemon
+
+    docker save "terry:$version" > ../image/image
+    docker images --no-trunc --digests "terry:$version" --format "{{.ID}}" > ../image/image-id
