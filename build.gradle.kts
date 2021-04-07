@@ -30,7 +30,6 @@ dependencies {
 	implementation("io.github.openfeign:feign-okhttp:11.0")
 	implementation("io.opentracing.contrib:opentracing-spring-jaeger-cloud-starter:3.2.2")
 
-
 	testImplementation("io.kotlintest:kotlintest-runner-junit5:3.3.0")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
