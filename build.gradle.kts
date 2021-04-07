@@ -21,12 +21,15 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
 	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("io.github.microutils:kotlin-logging:1.6.25")
 	implementation("com.github.boclips:kaltura-client:0.58.0")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.10.1")
 	implementation("com.github.boclips:videos:v751")
 	implementation("io.github.openfeign:feign-core:10.7.2")
 	implementation("io.github.openfeign:feign-okhttp:11.0")
+	implementation("io.opentracing.contrib:opentracing-spring-jaeger-cloud-starter:3.2.2")
+
 
 	testImplementation("io.kotlintest:kotlintest-runner-junit5:3.3.0")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
