@@ -31,6 +31,8 @@ run:
     GRADLE_USER_HOME="$(pwd)/.gradle"
     export GRADLE_USER_HOME
 
+    export OPENTRACING_JAEGER_ENABLED="false"
+
     version=$(cat version/tag)
 
     cd source
