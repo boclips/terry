@@ -73,7 +73,7 @@ class TerryTests {
     @Test
     fun `display a safenote for a given channel`() {
         val decision = mentionTerry(
-            "safenote for mythology-and-fiction_explained please bud?",
+            "SAfeNote for mythology-and-fiction_explained please bud?",
             user = "UBS7V80PR",
             channel = "#engineering")
         assertThat(decision.log).isEqualTo("Retrieving safenote for mythology-and-fiction_explained")
