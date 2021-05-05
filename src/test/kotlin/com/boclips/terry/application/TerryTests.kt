@@ -73,14 +73,14 @@ class TerryTests {
     @Test
     fun `display a safenote for a given channel`() {
         val decision = mentionTerry(
-            "safenote for mythology-and-fiction-explained please bud?",
+            "safenote for mythology-and-fiction_explained please bud?",
             user = "UBS7V80PR",
             channel = "#engineering")
-        assertThat(decision.log).isEqualTo("Retrieving safenote for mythology-and-fiction-explained")
+        assertThat(decision.log).isEqualTo("Retrieving safenote for mythology-and-fiction_explained")
         when (val response = decision.action) {
             is ChatReply -> {
                 assertThat(response.slackMessage.text).isEqualTo(
-                    "<@UBS7V80PR> one day I will do something with mythology-and-fiction-explained"
+                    "<@UBS7V80PR> one day I will do something with mythology-and-fiction_explained"
                 )
             }
             else ->
