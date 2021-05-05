@@ -1,12 +1,6 @@
 package com.boclips.terry.application
 
-import com.boclips.terry.infrastructure.incoming.AppMention
-import com.boclips.terry.infrastructure.incoming.BlockActions
-import com.boclips.terry.infrastructure.incoming.EventNotification
-import com.boclips.terry.infrastructure.incoming.Malformed
-import com.boclips.terry.infrastructure.incoming.SlackEvent
-import com.boclips.terry.infrastructure.incoming.SlackRequest
-import com.boclips.terry.infrastructure.incoming.VerificationRequest
+import com.boclips.terry.infrastructure.incoming.*
 import com.boclips.terry.infrastructure.outgoing.slack.SlackMessage
 import com.boclips.terry.infrastructure.outgoing.slack.SlackMessageVideo
 import com.boclips.terry.infrastructure.outgoing.slack.SlackMessageVideo.SlackMessageVideoType.KALTURA
@@ -14,13 +8,9 @@ import com.boclips.terry.infrastructure.outgoing.slack.SlackMessageVideo.SlackMe
 import com.boclips.terry.infrastructure.outgoing.slack.TranscriptCodeForEntryId
 import com.boclips.terry.infrastructure.outgoing.transcripts.Failure
 import com.boclips.terry.infrastructure.outgoing.transcripts.Success
-import com.boclips.terry.infrastructure.outgoing.videos.Error
-import com.boclips.terry.infrastructure.outgoing.videos.FoundKalturaVideo
-import com.boclips.terry.infrastructure.outgoing.videos.FoundVideo
-import com.boclips.terry.infrastructure.outgoing.videos.FoundYouTubeVideo
-import com.boclips.terry.infrastructure.outgoing.videos.MissingVideo
-import org.springframework.stereotype.Component
+import com.boclips.terry.infrastructure.outgoing.videos.*
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import org.springframework.stereotype.Component
 
 data class TranscriptCode(
     val tag: String,
@@ -102,7 +92,10 @@ class Terry {
         } ?: MalformedRequestRejection
 
     private fun blockActionsToTranscriptRequest(blockActions: BlockActions): TranscriptRequest =
-        (jacksonObjectMapper().readValue(blockActions.actions.first().selectedOption.value, TranscriptCodeForEntryId::class.java))
+        (jacksonObjectMapper().readValue(
+            blockActions.actions.first().selectedOption.value,
+            TranscriptCodeForEntryId::class.java
+        ))
             .let { videoCode ->
                 TranscriptRequest(
                     entryId = videoCode.entryId,
@@ -117,52 +110,77 @@ class Terry {
         when (event) {
             is AppMention -> {
                 extractVideoId(event.text)?.let { videoId ->
-                    Decision(
-                        log = "Retrieving video ID $videoId",
-                        action = VideoRetrieval(videoId) { videoServiceResponse ->
-                            when (videoServiceResponse) {
-                                is FoundKalturaVideo ->
-                                    replyWithVideo(
-                                        foundVideo = videoServiceResponse,
-                                        type = KALTURA,
-                                        event = event,
-                                        requestVideoId = videoId
-                                    )
-                                is FoundYouTubeVideo ->
-                                    replyWithVideo(
-                                        foundVideo = videoServiceResponse,
-                                        type = YOUTUBE,
-                                        event = event,
-                                        requestVideoId = videoId
-                                    )
-                                is MissingVideo ->
-                                    ChatReply(
-                                        slackMessage = SlackMessage(
-                                            channel = event.channel,
-                                            text = """<@${event.user}> Sorry, video $videoId doesn't seem to exist! :("""
-                                        )
-                                    )
-                                is Error ->
-                                    ChatReply(
-                                        slackMessage = SlackMessage(
-                                            channel = event.channel,
-                                            text = """<@${event.user}> looks like the video service is broken :("""
-                                        )
-                                    )
-                            }
-                        }
-                    )
-                } ?: Decision(
-                    log = "Responding via chat with \"${helpFor(event.user)}\"",
-                    action = ChatReply(
-                        slackMessage = SlackMessage(
-                            channel = event.channel,
-                            text = helpFor(event.user)
-                        )
-                    )
-                )
+                    videoRetrieval(videoId, event)
+                } ?: extractChannelName(event.text)?.let { channelName ->
+                    channelUploadCredentialRetrieval(channelName, event)
+                } ?: help(event)
             }
         }
+
+    private fun extractChannelName(text: String): String? =
+        """.*safenote(?: for)? ([a-z0-9-]+).*""".toRegex().let { pattern ->
+            pattern.matchEntire(text)?.groups?.get(1)?.value
+        }
+
+    private fun help(event: AppMention) = Decision(
+        log = "Responding via chat with \"${helpFor(event.user)}\"",
+        action = ChatReply(
+            slackMessage = SlackMessage(
+                channel = event.channel,
+                text = helpFor(event.user)
+            )
+        )
+    )
+
+    private fun channelUploadCredentialRetrieval(channelName: String, event: AppMention) = Decision(
+        log = "Retrieving safenote for $channelName",
+        action = ChatReply(
+            slackMessage = SlackMessage(
+                channel = event.channel,
+                text = "<@${event.user}> one day I will do something with $channelName"
+            )
+        )
+    )
+
+
+    private fun videoRetrieval(
+        videoId: String,
+        event: AppMention
+    ) = Decision(
+        log = "Retrieving video ID $videoId",
+        action = VideoRetrieval(videoId) { videoServiceResponse ->
+            when (videoServiceResponse) {
+                is FoundKalturaVideo ->
+                    replyWithVideo(
+                        foundVideo = videoServiceResponse,
+                        type = KALTURA,
+                        event = event,
+                        requestVideoId = videoId
+                    )
+                is FoundYouTubeVideo ->
+                    replyWithVideo(
+                        foundVideo = videoServiceResponse,
+                        type = YOUTUBE,
+                        event = event,
+                        requestVideoId = videoId
+                    )
+                is MissingVideo ->
+                    ChatReply(
+                        slackMessage = SlackMessage(
+                            channel = event.channel,
+                            text = """<@${event.user}> Sorry, video $videoId doesn't seem to exist! :("""
+                        )
+                    )
+                is Error ->
+                    ChatReply(
+                        slackMessage = SlackMessage(
+                            channel = event.channel,
+                            text = """<@${event.user}> looks like the video service is broken :("""
+                        )
+                    )
+            }
+        }
+    )
 
     private fun extractVideoId(text: String): String? =
         """.*video ([^ ]+).*""".toRegex().let { pattern ->

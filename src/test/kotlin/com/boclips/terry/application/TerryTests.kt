@@ -1,12 +1,6 @@
 package com.boclips.terry.application
 
-import com.boclips.terry.infrastructure.incoming.AppMention
-import com.boclips.terry.infrastructure.incoming.BlockAction
-import com.boclips.terry.infrastructure.incoming.BlockActionIdentifiable
-import com.boclips.terry.infrastructure.incoming.BlockActionSelectedOption
-import com.boclips.terry.infrastructure.incoming.BlockActions
-import com.boclips.terry.infrastructure.incoming.EventNotification
-import com.boclips.terry.infrastructure.incoming.VerificationRequest
+import com.boclips.terry.infrastructure.incoming.*
 import com.boclips.terry.infrastructure.outgoing.slack.SlackMessage
 import com.boclips.terry.infrastructure.outgoing.slack.SlackMessageVideo
 import com.boclips.terry.infrastructure.outgoing.slack.SlackMessageVideo.SlackMessageVideoType.KALTURA
@@ -21,7 +15,7 @@ import io.kotlintest.properties.assertAll
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.fail
 import org.junit.jupiter.api.Test
-import java.util.Date
+import java.util.*
 
 class TerryTests {
     private val irrelevant: String = "irrelevant"
@@ -73,6 +67,24 @@ class TerryTests {
                 else ->
                     fail<String>("Expected a video retrieval, but got $response")
             }
+        }
+    }
+
+    @Test
+    fun `display a safenote for a given channel`() {
+        val decision = mentionTerry(
+            "safenote for mythology-and-fiction-explained please bud?",
+            user = "UBS7V80PR",
+            channel = "#engineering")
+        assertThat(decision.log).isEqualTo("Retrieving safenote for mythology-and-fiction-explained")
+        when (val response = decision.action) {
+            is ChatReply -> {
+                assertThat(response.slackMessage.text).isEqualTo(
+                    "<@UBS7V80PR> one day I will do something with mythology-and-fiction-explained"
+                )
+            }
+            else ->
+                fail<String>("Expected a credential retrieval, but got $response")
         }
     }
 

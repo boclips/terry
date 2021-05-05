@@ -1,13 +1,7 @@
 package com.boclips.terry.presentation
 
 import com.boclips.kalturaclient.KalturaClient
-import com.boclips.terry.application.AuthenticityRejection
-import com.boclips.terry.application.ChatReply
-import com.boclips.terry.application.MalformedRequestRejection
-import com.boclips.terry.application.Terry
-import com.boclips.terry.application.VerificationResponse
-import com.boclips.terry.application.VideoRetrieval
-import com.boclips.terry.application.VideoTagging
+import com.boclips.terry.application.*
 import com.boclips.terry.infrastructure.incoming.Malformed
 import com.boclips.terry.infrastructure.incoming.SlackRequest
 import com.boclips.terry.infrastructure.outgoing.slack.SlackPoster
@@ -81,6 +75,7 @@ class SlackController(
             is VideoTagging ->
                 ok()
                     .also { tagVideo(action) }
+            is ChannelUploadCredentialRetrieval -> TODO()
         }
     }
 

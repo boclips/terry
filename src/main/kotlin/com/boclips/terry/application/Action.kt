@@ -20,6 +20,10 @@ data class VideoRetrieval(
     val onComplete: (VideoServiceResponse) -> ChatReply
 ) : Action()
 
+data class ChannelUploadCredentialRetrieval(
+    val channelName: String,
+) : Action()
+
 data class VideoTagging(
     val entryId: String,
     val tag: String,
