@@ -1,8 +1,8 @@
 package com.boclips.terry.application
 
 import com.boclips.terry.infrastructure.incoming.*
-import com.boclips.terry.infrastructure.outgoing.credentials.CredentialLink
-import com.boclips.terry.infrastructure.outgoing.credentials.CredentialNotFound
+import com.boclips.terry.infrastructure.outgoing.securecredentials.CredentialNotFound
+import com.boclips.terry.infrastructure.outgoing.securecredentials.SecureCredential
 import com.boclips.terry.infrastructure.outgoing.slack.SlackMessage
 import com.boclips.terry.infrastructure.outgoing.slack.SlackMessageVideo
 import com.boclips.terry.infrastructure.outgoing.slack.SlackMessageVideo.SlackMessageVideoType.KALTURA
@@ -101,9 +101,7 @@ class TerryTests {
             is ChannelUploadCredentialRetrieval ->
                 assertThat(
                     action.onComplete(
-                        CredentialLink(
-                            "https://example.com/mythology"
-                        )
+                        SecureCredential(url = "https://example.com/mythology")
                     )
                 )
                     .isEqualTo(

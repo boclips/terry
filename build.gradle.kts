@@ -31,6 +31,8 @@ dependencies {
 	implementation("io.github.openfeign:feign-core:10.7.2")
 	implementation("io.github.openfeign:feign-okhttp:11.0")
 	implementation("io.opentracing.contrib:opentracing-spring-jaeger-cloud-starter:3.2.2")
+	implementation("org.springframework.cloud:spring-cloud-gcp-starter-storage:1.2.8.RELEASE")
+	implementation("org.springframework.boot:spring-boot-starter-webflux")
 
 	testImplementation("io.kotlintest:kotlintest-runner-junit5:3.3.0")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")

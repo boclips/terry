@@ -4,8 +4,6 @@ import com.boclips.kalturaclient.KalturaClient
 import com.boclips.kalturaclient.TestKalturaClient
 import com.boclips.terry.infrastructure.Clock
 import com.boclips.terry.infrastructure.FakeClock
-import com.boclips.terry.infrastructure.outgoing.credentials.CredentialRetriever
-import com.boclips.terry.infrastructure.outgoing.credentials.FakeCredentialRetriever
 import com.boclips.terry.infrastructure.outgoing.slack.FakeSlackPoster
 import com.boclips.terry.infrastructure.outgoing.slack.SlackPoster
 import com.boclips.terry.infrastructure.outgoing.videos.FakeVideoService
@@ -34,6 +32,12 @@ class TestContext {
 
     @Bean
     @Primary
-    fun fakeCredentialRetriever(): CredentialRetriever = FakeCredentialRetriever()
+    fun fakeRawCredentialRetriever(): com.boclips.terry.infrastructure.outgoing.rawcredentials.Retriever =
+        com.boclips.terry.infrastructure.outgoing.rawcredentials.FakeRetriever()
+
+    @Bean
+    @Primary
+    fun fakeSecureCredentialRetriever(): com.boclips.terry.infrastructure.outgoing.securecredentials.Retriever =
+        com.boclips.terry.infrastructure.outgoing.securecredentials.FakeRetriever()
 }
 
