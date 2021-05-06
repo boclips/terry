@@ -1,8 +1,8 @@
 package com.boclips.terry.application
 
 import com.boclips.terry.infrastructure.incoming.*
-import com.boclips.terry.infrastructure.outgoing.credentials.CredentialLink
-import com.boclips.terry.infrastructure.outgoing.credentials.CredentialNotFound
+import com.boclips.terry.infrastructure.outgoing.securecredentials.CredentialNotFound
+import com.boclips.terry.infrastructure.outgoing.securecredentials.SecureCredential
 import com.boclips.terry.infrastructure.outgoing.slack.SlackMessage
 import com.boclips.terry.infrastructure.outgoing.slack.SlackMessageVideo
 import com.boclips.terry.infrastructure.outgoing.slack.SlackMessageVideo.SlackMessageVideoType.KALTURA
@@ -136,22 +136,20 @@ class Terry {
 
     private fun channelUploadCredentialRetrieval(channelName: String, event: AppMention) = Decision(
         log = "Retrieving safenote for $channelName",
-        action = ChannelUploadCredentialRetrieval(channelName) { channelCredentialResponse ->
-            when (channelCredentialResponse) {
-                is CredentialLink ->
-                    ChatReply(
-                        slackMessage = SlackMessage(
-                            text = "Sure <@${event.user}>, here you go: ${channelCredentialResponse.url}",
-                            channel = event.channel
-                        )
+        action = ChannelUploadCredentialRetrieval(channelName) { response ->
+            when (response) {
+                is SecureCredential -> ChatReply(
+                    slackMessage = SlackMessage(
+                        text = "Sure <@${event.user}>, here you go: ${response.url}",
+                        channel = event.channel
                     )
-                CredentialNotFound ->
-                    ChatReply(
-                        slackMessage = SlackMessage(
-                            text = "Sorry <@${event.user}>, I can't find that channel! Maybe check the name?",
-                            channel = event.channel
-                        )
+                )
+                CredentialNotFound -> ChatReply(
+                    slackMessage = SlackMessage(
+                        text = "Sorry <@${event.user}>, I can't find that channel! Maybe check the name?",
+                        channel = event.channel
                     )
+                )
             }
         }
     )

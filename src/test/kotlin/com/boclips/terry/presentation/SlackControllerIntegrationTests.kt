@@ -3,8 +3,8 @@ package com.boclips.terry.presentation
 import com.boclips.kalturaclient.TestKalturaClient
 import com.boclips.terry.infrastructure.FakeClock
 import com.boclips.terry.infrastructure.incoming.SlackSignature
-import com.boclips.terry.infrastructure.outgoing.credentials.CredentialLink
-import com.boclips.terry.infrastructure.outgoing.credentials.FakeCredentialRetriever
+import com.boclips.terry.infrastructure.outgoing.rawcredentials.Credential
+import com.boclips.terry.infrastructure.outgoing.rawcredentials.FakeRetriever
 import com.boclips.terry.infrastructure.outgoing.slack.FakeSlackPoster
 import com.boclips.terry.infrastructure.outgoing.slack.PostSuccess
 import com.boclips.terry.infrastructure.outgoing.slack.SlackMessage
@@ -43,7 +43,7 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
     lateinit var videoService: FakeVideoService
 
     @Autowired
-    lateinit var credentialRetriever: FakeCredentialRetriever
+    lateinit var credentialRetriever: FakeRetriever
 
     @Autowired
     lateinit var kalturaClient: TestKalturaClient
@@ -178,8 +178,9 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
         slackPoster.respondWith(PostSuccess(timestamp = BigDecimal(1231231)))
 
         credentialRetriever.respondWith(
-            CredentialLink(
-                "https://penguins.com"
+            Credential(
+                id = "AKIASOMEID",
+                secret = "hide-me-from-baddies"
             )
         )
 

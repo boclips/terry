@@ -4,7 +4,7 @@ import com.boclips.kalturaclient.KalturaClient
 import com.boclips.terry.application.*
 import com.boclips.terry.infrastructure.incoming.Malformed
 import com.boclips.terry.infrastructure.incoming.SlackRequest
-import com.boclips.terry.infrastructure.outgoing.credentials.CredentialRetriever
+import com.boclips.terry.infrastructure.outgoing.rawcredentials.Retriever
 import com.boclips.terry.infrastructure.outgoing.slack.SlackPoster
 import com.boclips.terry.infrastructure.outgoing.videos.VideoService
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -25,7 +25,7 @@ class SlackController(
     private val slackPoster: SlackPoster,
     private val videoService: VideoService,
     private val kalturaClient: KalturaClient,
-    private val credentialRetriever: CredentialRetriever,
+    private val retriever: Retriever,
     private val objectMapper: ObjectMapper
 ) {
     companion object : KLogging()
@@ -109,7 +109,7 @@ class SlackController(
         slackPoster = slackPoster,
         videoService = videoService,
         kalturaClient = kalturaClient,
-        credentialRetriever = credentialRetriever
+        retriever = retriever
     )
 
     private fun ok(obj: ControllerResponse = Success) =
