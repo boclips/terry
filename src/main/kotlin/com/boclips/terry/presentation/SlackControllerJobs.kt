@@ -1,8 +1,10 @@
 package com.boclips.terry.presentation
 
 import com.boclips.kalturaclient.KalturaClient
+import com.boclips.terry.application.ChannelUploadCredentialRetrieval
 import com.boclips.terry.application.VideoRetrieval
 import com.boclips.terry.application.VideoTagging
+import com.boclips.terry.infrastructure.outgoing.securecredentials.Retriever
 import com.boclips.terry.infrastructure.outgoing.slack.PostFailure
 import com.boclips.terry.infrastructure.outgoing.slack.PostSuccess
 import com.boclips.terry.infrastructure.outgoing.slack.SlackMessage
@@ -14,13 +16,14 @@ import org.springframework.scheduling.annotation.Async
 open class SlackControllerJobs(
     private val slackPoster: SlackPoster,
     private val videoService: VideoService,
-    private val kalturaClient: KalturaClient
+    private val kalturaClient: KalturaClient,
+    private val retriever: Retriever
 ) {
     @Async
     open fun getVideo(action: VideoRetrieval) {
         action
             .onComplete(videoService.get(action.videoId))
-            .apply { chat(slackMessage, "https://slack.com/api/chat.postMessage") }
+            .apply { chat(slackMessage) }
     }
 
     @Async
@@ -35,7 +38,14 @@ open class SlackControllerJobs(
     }
 
     @Async
-    open fun chat(slackMessage: SlackMessage, url: String): Unit =
+    fun getCredential(action: ChannelUploadCredentialRetrieval) {
+        action
+            .onComplete(retriever.get(action.channelName))
+            .apply { chat(slackMessage) }
+    }
+
+    @Async
+    open fun chat(slackMessage: SlackMessage, url: String = "https://slack.com/api/chat.postMessage"): Unit =
         when (slackPoster.chatPostMessage(slackMessage, url = url)) {
             is PostSuccess ->
                 SlackController.logger.debug { "Successful post of $slackMessage" }

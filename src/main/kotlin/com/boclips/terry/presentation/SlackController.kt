@@ -4,6 +4,7 @@ import com.boclips.kalturaclient.KalturaClient
 import com.boclips.terry.application.*
 import com.boclips.terry.infrastructure.incoming.Malformed
 import com.boclips.terry.infrastructure.incoming.SlackRequest
+import com.boclips.terry.infrastructure.outgoing.securecredentials.Retriever
 import com.boclips.terry.infrastructure.outgoing.slack.SlackPoster
 import com.boclips.terry.infrastructure.outgoing.videos.VideoService
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -24,6 +25,7 @@ class SlackController(
     private val slackPoster: SlackPoster,
     private val videoService: VideoService,
     private val kalturaClient: KalturaClient,
+    private val retriever: Retriever,
     private val objectMapper: ObjectMapper
 ) {
     companion object : KLogging()
@@ -54,8 +56,8 @@ class SlackController(
             Malformed
         }
 
-    private fun handleSlack(body: SlackRequest): ResponseEntity<ControllerResponse> {
-        return when (val action = terry.receiveSlack(body).action) {
+    private fun handleSlack(request: SlackRequest): ResponseEntity<ControllerResponse> {
+        return when (val action = terry.receiveSlack(request).action) {
             is AuthenticityRejection ->
                 unauthorized()
                     .also {
@@ -75,36 +77,40 @@ class SlackController(
             is VideoTagging ->
                 ok()
                     .also { tagVideo(action) }
-            is ChannelUploadCredentialRetrieval -> TODO()
+            is ChannelUploadCredentialRetrieval ->
+                ok()
+                    .also {
+                        getCredential(action)
+                    }
         }
     }
 
+    private fun getCredential(action: ChannelUploadCredentialRetrieval) {
+        slackControllerJobs()
+            .getCredential(action)
+    }
+
     private fun tagVideo(action: VideoTagging) {
-        SlackControllerJobs(
-            slackPoster = slackPoster,
-            videoService = videoService,
-            kalturaClient = kalturaClient
-        )
+        slackControllerJobs()
             .tagVideo(action)
     }
 
     private fun getVideo(action: VideoRetrieval) {
-        SlackControllerJobs(
-            slackPoster = slackPoster,
-            videoService = videoService,
-            kalturaClient = kalturaClient
-        )
+        slackControllerJobs()
             .getVideo(action)
     }
 
     private fun chat(action: ChatReply) {
-        SlackControllerJobs(
-            slackPoster = slackPoster,
-            videoService = videoService,
-            kalturaClient = kalturaClient
-        )
-            .chat(action.slackMessage, "https://slack.com/api/chat.postMessage")
+        slackControllerJobs()
+            .chat(action.slackMessage)
     }
+
+    private fun slackControllerJobs() = SlackControllerJobs(
+        slackPoster = slackPoster,
+        videoService = videoService,
+        kalturaClient = kalturaClient,
+        retriever = retriever
+    )
 
     private fun ok(obj: ControllerResponse = Success) =
         ResponseEntity(obj, HttpStatus.OK)

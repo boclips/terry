@@ -1,6 +1,9 @@
 package com.boclips.terry.application
 
 import com.boclips.terry.infrastructure.incoming.*
+import com.boclips.terry.infrastructure.outgoing.securecredentials.CredentialNotFound
+import com.boclips.terry.infrastructure.outgoing.securecredentials.SafenoteFailure
+import com.boclips.terry.infrastructure.outgoing.securecredentials.SecureCredential
 import com.boclips.terry.infrastructure.outgoing.slack.SlackMessage
 import com.boclips.terry.infrastructure.outgoing.slack.SlackMessageVideo
 import com.boclips.terry.infrastructure.outgoing.slack.SlackMessageVideo.SlackMessageVideoType.KALTURA
@@ -134,14 +137,29 @@ class Terry {
 
     private fun channelUploadCredentialRetrieval(channelName: String, event: AppMention) = Decision(
         log = "Retrieving safenote for $channelName",
-        action = ChatReply(
-            slackMessage = SlackMessage(
-                channel = event.channel,
-                text = "<@${event.user}> one day I will do something with $channelName"
-            )
-        )
+        action = ChannelUploadCredentialRetrieval(channelName) { response ->
+            when (response) {
+                is SecureCredential -> ChatReply(
+                    slackMessage = SlackMessage(
+                        text = "Sure <@${event.user}>, here you go: ${response.url}",
+                        channel = event.channel
+                    )
+                )
+                CredentialNotFound -> ChatReply(
+                    slackMessage = SlackMessage(
+                        text = "Sorry <@${event.user}>, I can't find that channel! Maybe check the name?",
+                        channel = event.channel
+                    )
+                )
+                is SafenoteFailure -> ChatReply(
+                    slackMessage = SlackMessage(
+                        text = "Sorry <@${event.user}>, the Safenote service isn't working! Ask an engineer? (${response.message})",
+                        channel = event.channel
+                    )
+                )
+            }
+        }
     )
-
 
     private fun videoRetrieval(
         videoId: String,

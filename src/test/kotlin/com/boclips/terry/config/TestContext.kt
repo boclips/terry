@@ -29,5 +29,15 @@ class TestContext {
 
     @Bean
     fun fakeKalturaClient(): KalturaClient = TestKalturaClient()
+
+    @Bean
+    @Primary
+    fun fakeRawCredentialRetriever(): com.boclips.terry.infrastructure.outgoing.rawcredentials.Retriever =
+        com.boclips.terry.infrastructure.outgoing.rawcredentials.FakeRetriever()
+
+    @Bean
+    @Primary
+    fun fakeSecureCredentialRetriever(): com.boclips.terry.infrastructure.outgoing.securecredentials.Retriever =
+        com.boclips.terry.infrastructure.outgoing.securecredentials.FakeRetriever()
 }
 
