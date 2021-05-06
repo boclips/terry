@@ -3,6 +3,8 @@ package com.boclips.terry.presentation
 import com.boclips.kalturaclient.TestKalturaClient
 import com.boclips.terry.infrastructure.FakeClock
 import com.boclips.terry.infrastructure.incoming.SlackSignature
+import com.boclips.terry.infrastructure.outgoing.credentials.CredentialLink
+import com.boclips.terry.infrastructure.outgoing.credentials.FakeCredentialRetriever
 import com.boclips.terry.infrastructure.outgoing.slack.FakeSlackPoster
 import com.boclips.terry.infrastructure.outgoing.slack.PostSuccess
 import com.boclips.terry.infrastructure.outgoing.slack.SlackMessage
@@ -41,12 +43,16 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
     lateinit var videoService: FakeVideoService
 
     @Autowired
+    lateinit var credentialRetriever: FakeCredentialRetriever
+
+    @Autowired
     lateinit var kalturaClient: TestKalturaClient
 
     @BeforeEach
     fun setUp() {
         slackPoster.reset()
         videoService.reset()
+        credentialRetriever.reset()
         clock.reset()
     }
 
@@ -171,6 +177,12 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
     fun `responds to safenote request with safenote URL`() {
         slackPoster.respondWith(PostSuccess(timestamp = BigDecimal(1231231)))
 
+        credentialRetriever.respondWith(
+            CredentialLink(
+                "https://penguins.com"
+            )
+        )
+
         postFromSlack(
             body = """
             {
@@ -202,7 +214,7 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
             .isEqualTo(
                 listOf(
                     SlackMessage(
-                        text = "<@U061F7AUR> one day I will do something with mythology-and-fiction-explained",
+                        text = "Sure <@U061F7AUR>, here you go: https://penguins.com",
                         channel = "C0LAN2Q65"
                     )
                 )

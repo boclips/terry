@@ -1,6 +1,8 @@
 package com.boclips.terry.application
 
 import com.boclips.terry.infrastructure.incoming.*
+import com.boclips.terry.infrastructure.outgoing.credentials.CredentialLink
+import com.boclips.terry.infrastructure.outgoing.credentials.CredentialNotFound
 import com.boclips.terry.infrastructure.outgoing.slack.SlackMessage
 import com.boclips.terry.infrastructure.outgoing.slack.SlackMessageVideo
 import com.boclips.terry.infrastructure.outgoing.slack.SlackMessageVideo.SlackMessageVideoType.KALTURA
@@ -71,20 +73,75 @@ class TerryTests {
     }
 
     @Test
-    fun `display a safenote for a given channel`() {
+    fun `can retrieve credentials for a channel`() {
         val decision = mentionTerry(
             "SAfeNote for mythology-and-fiction_explained please bud?",
             user = "UBS7V80PR",
-            channel = "#engineering")
+            channel = "#engineering"
+        )
         assertThat(decision.log).isEqualTo("Retrieving safenote for mythology-and-fiction_explained")
         when (val response = decision.action) {
-            is ChatReply -> {
-                assertThat(response.slackMessage.text).isEqualTo(
-                    "<@UBS7V80PR> one day I will do something with mythology-and-fiction_explained"
+            is ChannelUploadCredentialRetrieval -> {
+                assertThat(response.channelName).isEqualTo(
+                    "mythology-and-fiction_explained"
                 )
             }
             else ->
                 fail<String>("Expected a credential retrieval, but got $response")
+        }
+    }
+
+    @Test
+    fun `when credentials are retrieved successfully reply with a credential link`() {
+        when (val action = mentionTerry(
+            "safenote for mythology-and-fiction_explained",
+            user = "THAD123",
+            channel = "#engineering"
+        ).action) {
+            is ChannelUploadCredentialRetrieval ->
+                assertThat(
+                    action.onComplete(
+                        CredentialLink(
+                            "https://example.com/mythology"
+                        )
+                    )
+                )
+                    .isEqualTo(
+                        ChatReply(
+                            slackMessage = SlackMessage(
+                                channel = "#engineering",
+                                text = "Sure <@THAD123>, here you go: https://example.com/mythology",
+                            )
+                        )
+                    )
+            else ->
+                fail<String>("Expected a channel upload credential retrieval, but got $action")
+        }
+    }
+
+    @Test
+    fun `when credentials are not found tell user`() {
+        when (val action = mentionTerry(
+            "safenote for mythology-and-fiction_explained",
+            user = "THAD123",
+            channel = "#engineering"
+        ).action) {
+            is ChannelUploadCredentialRetrieval ->
+                assertThat(
+                    action.onComplete(
+                        CredentialNotFound
+                    )
+                )
+                    .isEqualTo(
+                        ChatReply(
+                            slackMessage = SlackMessage(
+                                channel = "#engineering",
+                                text = "Sorry <@THAD123>, I can't find that channel! Maybe check the name?",
+                            )
+                        )
+                    )
+            else ->
+                fail<String>("Expected a channel upload credential retrieval, but got $action")
         }
     }
 

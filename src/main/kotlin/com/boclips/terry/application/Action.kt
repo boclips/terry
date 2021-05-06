@@ -1,6 +1,7 @@
 package com.boclips.terry.application
 
 import com.boclips.terry.infrastructure.incoming.RawSlackRequest
+import com.boclips.terry.infrastructure.outgoing.credentials.ChannelCredentialResponse
 import com.boclips.terry.infrastructure.outgoing.slack.SlackMessage
 import com.boclips.terry.infrastructure.outgoing.transcripts.TaggingResponse
 import com.boclips.terry.infrastructure.outgoing.videos.VideoServiceResponse
@@ -22,6 +23,7 @@ data class VideoRetrieval(
 
 data class ChannelUploadCredentialRetrieval(
     val channelName: String,
+    val onComplete: (ChannelCredentialResponse) -> ChatReply
 ) : Action()
 
 data class VideoTagging(

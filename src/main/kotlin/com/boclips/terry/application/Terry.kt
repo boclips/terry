@@ -1,6 +1,8 @@
 package com.boclips.terry.application
 
 import com.boclips.terry.infrastructure.incoming.*
+import com.boclips.terry.infrastructure.outgoing.credentials.CredentialLink
+import com.boclips.terry.infrastructure.outgoing.credentials.CredentialNotFound
 import com.boclips.terry.infrastructure.outgoing.slack.SlackMessage
 import com.boclips.terry.infrastructure.outgoing.slack.SlackMessageVideo
 import com.boclips.terry.infrastructure.outgoing.slack.SlackMessageVideo.SlackMessageVideoType.KALTURA
@@ -134,14 +136,25 @@ class Terry {
 
     private fun channelUploadCredentialRetrieval(channelName: String, event: AppMention) = Decision(
         log = "Retrieving safenote for $channelName",
-        action = ChatReply(
-            slackMessage = SlackMessage(
-                channel = event.channel,
-                text = "<@${event.user}> one day I will do something with $channelName"
-            )
-        )
+        action = ChannelUploadCredentialRetrieval(channelName) { channelCredentialResponse ->
+            when (channelCredentialResponse) {
+                is CredentialLink ->
+                    ChatReply(
+                        slackMessage = SlackMessage(
+                            text = "Sure <@${event.user}>, here you go: ${channelCredentialResponse.url}",
+                            channel = event.channel
+                        )
+                    )
+                CredentialNotFound ->
+                    ChatReply(
+                        slackMessage = SlackMessage(
+                            text = "Sorry <@${event.user}>, I can't find that channel! Maybe check the name?",
+                            channel = event.channel
+                        )
+                    )
+            }
+        }
     )
-
 
     private fun videoRetrieval(
         videoId: String,
