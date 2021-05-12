@@ -1,7 +1,7 @@
 package com.boclips.terry.infrastructure.outgoing.securecredentials
 
-import com.boclips.terry.infrastructure.outgoing.rawcredentials.Credential
-import com.boclips.terry.infrastructure.outgoing.rawcredentials.FakeRetriever
+import com.boclips.terry.infrastructure.outgoing.rawcredentials.RawCredential
+import com.boclips.terry.infrastructure.outgoing.rawcredentials.FakeRawCredentialRetriever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
@@ -9,8 +9,8 @@ import org.junit.jupiter.api.fail
 class SafenoteRetrieverTest {
     @Test
     fun `obtains credential and wraps it in a Safenote`() {
-        val rawRetriever = FakeRetriever()
-        rawRetriever.respondWith(Credential(id = "AKIAHEREITIS", secret = "somesecret"))
+        val rawRetriever = FakeRawCredentialRetriever()
+        rawRetriever.respondWith(RawCredential(id = "AKIAHEREITIS", secret = "somesecret"))
         val retriever = SafenoteRetriever(rawRetriever)
         when (val response = retriever.get("my-channel")) {
             CredentialNotFound -> fail("this test had a stubbed credential - how did this happen?")
@@ -20,8 +20,8 @@ class SafenoteRetrieverTest {
 
     @Test
     fun `responds appropriately to Safenote failure`() {
-        val rawRetriever = FakeRetriever()
-        rawRetriever.respondWith(Credential(id = "AKIAHEREITIS", secret = "somesecret"))
+        val rawRetriever = FakeRawCredentialRetriever()
+        rawRetriever.respondWith(RawCredential(id = "AKIAHEREITIS", secret = "somesecret"))
         val retriever = SafenoteRetriever(rawRetriever, url = "https://httpbin.org/status/503")
         val response = retriever.get("my-channel") as SafenoteFailure
         assertThat(response.message).contains("No content to map due to end-of-input")
@@ -29,8 +29,8 @@ class SafenoteRetrieverTest {
 
     @Test
     fun `responds appropriately to missing credential`() {
-        val rawRetriever = FakeRetriever()
-        rawRetriever.respondWith(com.boclips.terry.infrastructure.outgoing.rawcredentials.CredentialNotFound)
+        val rawRetriever = FakeRawCredentialRetriever()
+        rawRetriever.respondWith(com.boclips.terry.infrastructure.outgoing.rawcredentials.RawCredentialNotFound)
         val retriever = SafenoteRetriever(rawRetriever)
         assertThat(retriever.get("my-channel")).isEqualTo(CredentialNotFound)
     }

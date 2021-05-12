@@ -2,11 +2,11 @@ package com.boclips.terry.infrastructure.outgoing.rawcredentials
 
 import com.boclips.terry.Fake
 
-class FakeRetriever : Fake, Retriever {
+class FakeRawCredentialRetriever : Fake, RawCredentialRetriever {
     var lastChannelNameReceived: String? = null
-    private var nextResponse: Response? = null
+    private var nextResponse: RawCredentialResponse? = null
 
-    override fun get(channelName: String): Response =
+    override fun get(channelName: String): RawCredentialResponse =
         nextResponse!!
             .also { lastChannelNameReceived = channelName }
 
@@ -17,6 +17,6 @@ class FakeRetriever : Fake, Retriever {
                 lastChannelNameReceived = null
             }
 
-    fun respondWith(response: Response): FakeRetriever = this
+    fun respondWith(response: RawCredentialResponse): FakeRawCredentialRetriever = this
         .also { nextResponse = response }
 }

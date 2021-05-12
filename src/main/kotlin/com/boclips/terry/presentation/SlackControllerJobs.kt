@@ -4,7 +4,7 @@ import com.boclips.kalturaclient.KalturaClient
 import com.boclips.terry.application.ChannelUploadCredentialRetrieval
 import com.boclips.terry.application.VideoRetrieval
 import com.boclips.terry.application.VideoTagging
-import com.boclips.terry.infrastructure.outgoing.securecredentials.Retriever
+import com.boclips.terry.infrastructure.outgoing.securecredentials.SecureCredentialRetriever
 import com.boclips.terry.infrastructure.outgoing.slack.PostFailure
 import com.boclips.terry.infrastructure.outgoing.slack.PostSuccess
 import com.boclips.terry.infrastructure.outgoing.slack.SlackMessage
@@ -17,7 +17,7 @@ open class SlackControllerJobs(
     private val slackPoster: SlackPoster,
     private val videoService: VideoService,
     private val kalturaClient: KalturaClient,
-    private val retriever: Retriever
+    private val retriever: SecureCredentialRetriever
 ) {
     @Async
     open fun getVideo(action: VideoRetrieval) {

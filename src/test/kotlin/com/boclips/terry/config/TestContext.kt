@@ -32,12 +32,12 @@ class TestContext {
 
     @Bean
     @Primary
-    fun fakeRawCredentialRetriever(): com.boclips.terry.infrastructure.outgoing.rawcredentials.Retriever =
-        com.boclips.terry.infrastructure.outgoing.rawcredentials.FakeRetriever()
+    fun fakeRawCredentialRetriever(): com.boclips.terry.infrastructure.outgoing.rawcredentials.RawCredentialRetriever =
+        com.boclips.terry.infrastructure.outgoing.rawcredentials.FakeRawCredentialRetriever()
 
     @Bean
     @Primary
-    fun fakeSecureCredentialRetriever(): com.boclips.terry.infrastructure.outgoing.securecredentials.Retriever =
-        com.boclips.terry.infrastructure.outgoing.securecredentials.FakeRetriever()
+    fun fakeSecureCredentialRetriever(): com.boclips.terry.infrastructure.outgoing.securecredentials.SecureCredentialRetriever =
+        com.boclips.terry.infrastructure.outgoing.securecredentials.FakeSecureCredentialRetriever()
 }
 

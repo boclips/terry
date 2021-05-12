@@ -7,15 +7,15 @@ import com.google.cloud.storage.Storage
 class CloudStorageRetriever(
     private val storage: Storage,
     private val bucketName: String
-) : Retriever {
-    override fun get(channelName: String): Response =
+) : RawCredentialRetriever {
+    override fun get(channelName: String): RawCredentialResponse =
         terraformState()
             .resources
             .filterIsInstance<AwsIamAccessKey>()
             .find { accessKey -> accessKey.instances.first().attributes.user == channelName }
             ?.instances?.first()?.attributes
-            ?.run { Credential(id, secret) }
-            ?: CredentialNotFound
+            ?.run { RawCredential(id, secret) }
+            ?: RawCredentialNotFound
 
     private fun terraformState(): TerraformState =
         jacksonObjectMapper().readValue(json(), TerraformState::class.java)

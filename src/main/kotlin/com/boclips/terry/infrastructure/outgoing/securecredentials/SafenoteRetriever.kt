@@ -7,12 +7,12 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
-import com.boclips.terry.infrastructure.outgoing.rawcredentials.Credential as RawCredential
-import com.boclips.terry.infrastructure.outgoing.rawcredentials.CredentialNotFound as RawCredentialNotFound
-import com.boclips.terry.infrastructure.outgoing.rawcredentials.Retriever as RawRetriever
+import com.boclips.terry.infrastructure.outgoing.rawcredentials.RawCredential
+import com.boclips.terry.infrastructure.outgoing.rawcredentials.RawCredentialNotFound
+import com.boclips.terry.infrastructure.outgoing.rawcredentials.RawCredentialRetriever
 
-class SafenoteRetriever(val rawRetriever: RawRetriever, val url: String = "https://safenote.co/api/note") : Retriever {
-    override fun get(channelName: String): Response =
+class SafenoteRetriever(val rawRetriever: RawCredentialRetriever, val url: String = "https://safenote.co/api/note") : SecureCredentialRetriever {
+    override fun get(channelName: String): SecureCredentialResponse =
         when (val rawCredential = rawRetriever.get(channelName)) {
             is RawCredential -> {
                 val note = "Username: ${rawCredential.id}\nPassword: ${rawCredential.secret}"
@@ -25,7 +25,7 @@ class SafenoteRetriever(val rawRetriever: RawRetriever, val url: String = "https
                     .POST(json)
                     .build()
                 val response = HttpClient.newBuilder().build().send(request, HttpResponse.BodyHandlers.ofString())
-                val resp: Response = try {
+                val resp: SecureCredentialResponse = try {
                     val safenote = mapper.readValue(response.body(), Safenote::class.java)
                     SecureCredential(url = safenote.link)
                 } catch (e: Exception) {

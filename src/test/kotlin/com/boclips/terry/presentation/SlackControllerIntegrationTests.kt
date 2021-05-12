@@ -3,7 +3,7 @@ package com.boclips.terry.presentation
 import com.boclips.kalturaclient.TestKalturaClient
 import com.boclips.terry.infrastructure.FakeClock
 import com.boclips.terry.infrastructure.incoming.SlackSignature
-import com.boclips.terry.infrastructure.outgoing.securecredentials.FakeRetriever
+import com.boclips.terry.infrastructure.outgoing.securecredentials.FakeSecureCredentialRetriever
 import com.boclips.terry.infrastructure.outgoing.securecredentials.SecureCredential
 import com.boclips.terry.infrastructure.outgoing.slack.FakeSlackPoster
 import com.boclips.terry.infrastructure.outgoing.slack.PostSuccess
@@ -43,7 +43,7 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
     lateinit var videoService: FakeVideoService
 
     @Autowired
-    lateinit var credentialRetriever: FakeRetriever
+    lateinit var credentialRetriever: FakeSecureCredentialRetriever
 
     @Autowired
     lateinit var kalturaClient: TestKalturaClient
