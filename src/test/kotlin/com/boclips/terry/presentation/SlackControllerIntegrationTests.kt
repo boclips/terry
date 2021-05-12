@@ -161,15 +161,8 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
             .andExpect(status().isOk)
             .andExpect(content().json("{}"))
 
-        assertThat(slackPoster.slackMessages)
-            .isEqualTo(
-                listOf(
-                    SlackMessage(
-                        text = "<@U061F7AUR> I don't do much yet",
-                        channel = "C0LAN2Q65"
-                    )
-                )
-            )
+        assertThat(slackPoster.slackMessages[0].text).startsWith("<@U061F7AUR> Some things you can do:")
+        assertThat(slackPoster.slackMessages[0].channel).isEqualTo("C0LAN2Q65")
     }
 
 
