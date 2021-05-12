@@ -37,7 +37,7 @@ class MessageConverterTest {
                         "type": "section",
                         "text": {
                             "type": "mrkdwn",
-                            "text": "*some text*"
+                            "text": "some text"
                         }
                     },
                     {

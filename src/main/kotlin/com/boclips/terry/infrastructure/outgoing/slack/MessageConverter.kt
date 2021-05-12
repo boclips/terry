@@ -23,7 +23,7 @@ class MessageConverter {
                 SlackView(
                     channel = slackMessage.channel,
                     blocks = listOf(
-                        textSection("*${slackMessage.text}*")
+                        textSection("${slackMessage.text}")
                     ) + videoBlocks
                 )
             }
