@@ -206,11 +206,7 @@ class Terry {
         }
 
     private fun helpFor(user: String): String = "<@$user> ${help()}"
-    private fun help(): String = """
-        Some things you can do:
-        video 1234 (retrieves a video and displays a menu)
-        safenote a-channel-name (retrieves a new Safenote for an existing channel's upload credentials)
-    """.trimIndent()
+    private fun help(): String = "Some things you can do:\n\nvideo 1234 (retrieves a video and displays a menu)\nsafenote a-channel-name (retrieves a new Safenote for an existing channel's upload credentials)"
 
     private fun replyWithVideo(
         foundVideo: FoundVideo,
