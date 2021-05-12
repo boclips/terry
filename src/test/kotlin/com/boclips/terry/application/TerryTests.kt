@@ -44,18 +44,11 @@ class TerryTests {
 
     @Test
     fun `responds to Slack enquiry about his job description`() {
-        assertThat(mentionTerry("hi Tezza", user = "UBS7V80PR", channel = "#engineering"))
-            .isEqualTo(
-                Decision(
-                    action = ChatReply(
-                        slackMessage = SlackMessage(
-                            channel = "#engineering",
-                            text = "<@UBS7V80PR> I don't do much yet"
-                        )
-                    ),
-                    log = """Responding via chat with "<@UBS7V80PR> I don't do much yet""""
-                )
-            )
+        val decision = mentionTerry("hi Tezza", user = "UBS7V80PR", channel = "#engineering")
+        val reply = decision.action as ChatReply
+        assertThat(reply.slackMessage.channel).isEqualTo("#engineering")
+        assertThat(reply.slackMessage.text).startsWith("<@UBS7V80PR> Some things you can do:")
+        assertThat(decision.log).contains("Some things you can do")
     }
 
     @Test
@@ -143,6 +136,7 @@ class TerryTests {
                 fail<String>("Expected a channel upload credential retrieval, but got $action")
         }
     }
+
     @Test
     fun `when Safenote fails tell user`() {
         when (val action = mentionTerry(
