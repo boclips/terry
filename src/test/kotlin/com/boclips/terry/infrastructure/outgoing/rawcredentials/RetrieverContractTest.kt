@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 class FakeRetrieverTests : RetrieverTests() {
     @BeforeEach
     fun setUp() {
-        retrieverForExistant = FakeRetriever()
+        retrieverForExistent = FakeRetriever()
             .apply { respondWith(Credential(id = "AKIADEFOANAMAZONID1", secret = "password1")) }
         retrieverForMissing = FakeRetriever()
             .apply { respondWith(CredentialNotFound) }
@@ -18,7 +18,7 @@ class FakeRetrieverTests : RetrieverTests() {
 class CloudStorageRetrieverTests : RetrieverTests() {
     @BeforeEach
     fun setUp() {
-        retrieverForExistant = CloudStorageRetriever(
+        retrieverForExistent = CloudStorageRetriever(
             storage = StorageOptions.getDefaultInstance().service,
             bucketName = "boclips-terraform-channels-test"
         )
@@ -30,12 +30,12 @@ class CloudStorageRetrieverTests : RetrieverTests() {
 }
 
 abstract class RetrieverTests {
-    var retrieverForExistant: Retriever? = null
+    var retrieverForExistent: Retriever? = null
     var retrieverForMissing: Retriever? = null
 
     @Test
     fun `retrieves credential that exists`() {
-        assertThat(retrieverForExistant!!.get("3blue1brown"))
+        assertThat(retrieverForExistent!!.get("3blue1brown"))
             .isEqualTo(Credential(id = "AKIADEFOANAMAZONID1", secret = "password1"))
     }
 
