@@ -44,7 +44,7 @@ run:
     source /docker-lib.sh
     start_docker
 
-    ./gradlew -Pversion="$version" test bootBuildImage --no-daemon
+    ./gradlew -Pversion="$version" test bootBuildImage --no-daemon --info
 
     docker save "terry:$version" > ../image/image
     docker images --no-trunc --digests "terry:$version" --format "{{.ID}}" > ../image/image-id
