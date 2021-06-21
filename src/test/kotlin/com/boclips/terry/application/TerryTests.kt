@@ -86,6 +86,44 @@ class TerryTests {
     }
 
     @Test
+    fun `can retrieve credentials for a channel name delimited by 'for' and end-of-line`() {
+        val decision = mentionTerry(
+            "can I get a new safenote for The Business Professor",
+            user = "UBS7V80PR",
+            channel = "#engineering"
+        )
+        assertThat(decision.log).isEqualTo("Retrieving safenote for the-business-professor")
+        when (val response = decision.action) {
+            is ChannelUploadCredentialRetrieval -> {
+                assertThat(response.channelName).isEqualTo(
+                    "the-business-professor"
+                )
+            }
+            else ->
+                fail<String>("Expected a credential retrieval, but got $response")
+        }
+    }
+
+    @Test
+    fun `can retrieve credentials for a channel name delimited by 'for' and 'please'`() {
+        val decision = mentionTerry(
+            "can I get a new safenote for The Business Professor please my good chumster?",
+            user = "UBS7V80PR",
+            channel = "#engineering"
+        )
+        assertThat(decision.log).isEqualTo("Retrieving safenote for the-business-professor")
+        when (val response = decision.action) {
+            is ChannelUploadCredentialRetrieval -> {
+                assertThat(response.channelName).isEqualTo(
+                    "the-business-professor"
+                )
+            }
+            else ->
+                fail<String>("Expected a credential retrieval, but got $response")
+        }
+    }
+
+    @Test
     fun `when credentials are retrieved successfully reply with a credential link`() {
         when (val action = mentionTerry(
             "safenote for mythology-and-fiction_explained",
