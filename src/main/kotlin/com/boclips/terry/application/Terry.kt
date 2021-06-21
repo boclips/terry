@@ -121,7 +121,7 @@ class Terry {
         }
 
     private fun extractChannelName(text: String): String? =
-        """.*safenote(?: for)? ([a-zA-Z0-9-_ ]+).*""".toRegex(RegexOption.IGNORE_CASE).let { pattern ->
+        """.*safenote(?: for)? ([a-z0-9-_ ]+).*""".toRegex(RegexOption.IGNORE_CASE).let { pattern ->
             pattern.matchEntire(text)
                 ?.groups
                 ?.get(1)
