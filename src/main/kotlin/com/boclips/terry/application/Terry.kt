@@ -147,13 +147,13 @@ class Terry {
             when (response) {
                 is SecureCredential -> ChatReply(
                     slackMessage = SlackMessage(
-                        text = "Sure <@${event.user}>, here you go: ${response.url}",
+                        text = """Sure <@${event.user}>, here are the credentials for "$channelName": ${response.url}""",
                         channel = event.channel
                     )
                 )
                 CredentialNotFound -> ChatReply(
                     slackMessage = SlackMessage(
-                        text = "Sorry <@${event.user}>, I can't find that channel! Maybe check the name?",
+                        text = """Sorry <@${event.user}>, I can't find "$channelName" - maybe check the name?""",
                         channel = event.channel
                     )
                 )

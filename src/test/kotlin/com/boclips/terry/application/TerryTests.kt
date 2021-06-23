@@ -140,7 +140,7 @@ class TerryTests {
                         ChatReply(
                             slackMessage = SlackMessage(
                                 channel = "#engineering",
-                                text = "Sure <@THAD123>, here you go: https://example.com/mythology",
+                                text = """Sure <@THAD123>, here are the credentials for "mythology-and-fiction_explained": https://example.com/mythology"""
                             )
                         )
                     )
@@ -166,7 +166,7 @@ class TerryTests {
                         ChatReply(
                             slackMessage = SlackMessage(
                                 channel = "#engineering",
-                                text = "Sorry <@THAD123>, I can't find that channel! Maybe check the name?",
+                                text = """Sorry <@THAD123>, I can't find "mythology-and-fiction_explained" - maybe check the name?"""
                             )
                         )
                     )
@@ -192,7 +192,7 @@ class TerryTests {
                         ChatReply(
                             slackMessage = SlackMessage(
                                 channel = "#engineering",
-                                text = "Sorry <@THAD123>, the Safenote service isn't working! Ask an engineer? (looks like Safenote is down!)",
+                                text = "Sorry <@THAD123>, the Safenote service isn't working! Ask an engineer? (looks like Safenote is down!)"
                             )
                         )
                     )

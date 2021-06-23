@@ -205,7 +205,7 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
             .isEqualTo(
                 listOf(
                     SlackMessage(
-                        text = "Sure <@U061F7AUR>, here you go: https://penguins.com",
+                        text = """Sure <@U061F7AUR>, here are the credentials for "mythology-and-fiction-explained": https://penguins.com""",
                         channel = "C0LAN2Q65"
                     )
                 )
