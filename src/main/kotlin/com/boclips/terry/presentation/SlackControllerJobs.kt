@@ -46,10 +46,10 @@ open class SlackControllerJobs(
 
     @Async
     open fun chat(slackMessage: SlackMessage, url: String = "https://slack.com/api/chat.postMessage"): Unit =
-        when (slackPoster.chatPostMessage(slackMessage, url = url)) {
+        when (val response = slackPoster.chatPostMessage(slackMessage, url = url)) {
             is PostSuccess ->
                 SlackController.logger.debug { "Successful post of $slackMessage" }
             is PostFailure ->
-                SlackController.logger.error { "Failed post to Slack" }
+                SlackController.logger.error { "Failed post to Slack: ${response.message}" }
         }
 }
