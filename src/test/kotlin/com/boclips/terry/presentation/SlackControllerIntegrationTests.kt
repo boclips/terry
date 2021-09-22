@@ -124,7 +124,8 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
                 "token": "sometoken",
                 "poo": "iamchallenging",
                 "type": "url_verification"
-            }""".trimIndent(),
+            }
+            """.trimIndent(),
             path = "/slack"
         )
             .andExpect(status().is4xxClientError)
@@ -155,7 +156,8 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
                 "authed_users": [
                     "U0LAN0Z89"
                 ]
-            }""".trimIndent(),
+            }
+            """.trimIndent(),
             path = "/slack"
         )
             .andExpect(status().isOk)
@@ -164,7 +166,6 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
         assertThat(slackPoster.slackMessages[0].text).startsWith("<@U061F7AUR> Some things you can do:")
         assertThat(slackPoster.slackMessages[0].channel).isEqualTo("C0LAN2Q65")
     }
-
 
     @Test
     fun `responds to safenote request with safenote URL`() {
@@ -195,7 +196,8 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
                 "authed_users": [
                     "U0LAN0Z89"
                 ]
-            }""".trimIndent(),
+            }
+            """.trimIndent(),
             path = "/slack"
         )
             .andExpect(status().isOk)
@@ -206,6 +208,54 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
                 listOf(
                     SlackMessage(
                         text = """Sure <@U061F7AUR>, here are the credentials for "mythology-and-fiction-explained": https://penguins.com""",
+                        channel = "C0LAN2Q65"
+                    )
+                )
+            )
+    }
+
+    // can I get a safenot for blabla? -
+    // can you create a bucket for blabla -> 
+    // bucket has been created with this name
+    // ask for bucket password
+
+    @Test
+    fun `responds to bucket creation request with confirmation of action`() {
+        slackPoster.respondWith(PostSuccess(timestamp = BigDecimal(1231231)))
+
+        postFromSlack(
+            body = """
+            {
+                "token": "ZZZZZZWSxiZZZ2yIvs3peJ",
+                "team_id": "T061EG9R6",
+                "api_app_id": "A0MDYCDME",
+                "event": {
+                    "funny_unknown_property": "to-test-ignoring-unknown-properties",
+                    "type": "app_mention",
+                    "user": "U061F7AUR",
+                    "text": "Hey <@U0LAN0Z89>, can you create a new bucket for new-channel",
+                    "ts": "1515449438.000011",
+                    "channel": "C0LAN2Q65",
+                    "event_ts": "1515449438000011"
+                },
+                "type": "event_callback",
+                "event_id": "Ev0MDYGDKJ",
+                "event_time": 1515449438000011,
+                "authed_users": [
+                    "U0LAN0Z89"
+                ]
+            }
+            """.trimIndent(),
+            path = "/slack"
+        )
+            .andExpect(status().isOk)
+            .andExpect(content().json("{}"))
+
+        assertThat(slackPoster.slackMessages)
+            .isEqualTo(
+                listOf(
+                    SlackMessage(
+                        text = """Sure <@U061F7AUR>, bucket has been created for: "new-channel""",
                         channel = "C0LAN2Q65"
                     )
                 )
@@ -246,7 +296,8 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
                 "authed_users": [
                     "U0LAN0Z89"
                 ]
-            }""".trimIndent(),
+            }
+            """.trimIndent(),
             path = "/slack"
         )
             .andExpect(status().isOk)
@@ -292,7 +343,6 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
             path = "/slack-interaction"
         )
             .andExpect(status().isOk)
-
 
         assertThat(
             slackSignature.compute(
