@@ -1,6 +1,7 @@
 package com.boclips.terry.application
 
 import com.boclips.terry.infrastructure.incoming.*
+import com.boclips.terry.infrastructure.outgoing.channels.ChannelCreationSuccess
 import com.boclips.terry.infrastructure.outgoing.securecredentials.CredentialNotFound
 import com.boclips.terry.infrastructure.outgoing.securecredentials.SafenoteFailure
 import com.boclips.terry.infrastructure.outgoing.securecredentials.SecureCredential
@@ -49,6 +50,52 @@ class TerryTests {
         assertThat(reply.slackMessage.channel).isEqualTo("#engineering")
         assertThat(reply.slackMessage.text).startsWith("<@UBS7V80PR> Some things you can do:")
         assertThat(decision.log).contains("Some things you can do")
+    }
+
+    @Test
+    fun `creates a channel when given a name`() {
+        val decision = mentionTerry(
+            "ChAnNel for mythology-and-fiction_explained please bud?",
+            user = "UBS7V80PR",
+            channel = "#engineering"
+        )
+        assertThat(decision.log).isEqualTo("Creating channel mythology-and-fiction_explained")
+        when (val response = decision.action) {
+            is ChannelCreation -> {
+                assertThat(response.channelName).isEqualTo(
+                    "mythology-and-fiction_explained"
+                )
+            }
+            else ->
+                fail<String>("Expected a channel creation, but got $response")
+        }
+    }
+
+    @Test
+    fun `when channel is created successfully, reply via chat`() {
+        when (val action = mentionTerry(
+            "channel for mythology-and-fiction_explained",
+            user = "THAD123",
+            channel = "#engineering"
+        ).action) {
+            is ChannelCreation ->
+                assertThat(
+                    action.onComplete(
+                        ChannelCreationSuccess
+                    )
+                )
+                    .isEqualTo(
+                        ChatReply(
+                            slackMessage = SlackMessage(
+                                channel = "#engineering",
+                                text = """<@THAD123> I've created "mythology-and-fiction_explained"! You can now ask me for its safenote."""
+                            )
+                        )
+                    )
+            else ->
+                fail<String>("Expected a channel creation, but got $action")
+        }
+
     }
 
     @Test

@@ -32,6 +32,8 @@ dependencies {
 	implementation("io.github.openfeign:feign-okhttp:11.0")
 	implementation("io.opentracing.contrib:opentracing-spring-jaeger-cloud-starter:3.2.2")
 	implementation("org.springframework.cloud:spring-cloud-gcp-starter-storage:1.2.8.RELEASE")
+	implementation(platform("com.amazonaws:aws-java-sdk-bom:1.11.1000"))
+	implementation("com.amazonaws:aws-java-sdk-s3")
 
 	testImplementation("io.kotlintest:kotlintest-runner-junit5:3.3.0")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
