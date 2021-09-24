@@ -1,7 +1,7 @@
 package com.boclips.terry.infrastructure.outgoing.rawcredentials
 
-import com.google.cloud.storage.StorageOptions
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.fail
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -15,17 +15,11 @@ class FakeRawCredentialRetrieverTests : RawCredentialRetrieverTests() {
     }
 }
 
-class CloudStorageRetrieverTests : RawCredentialRetrieverTests() {
+class IamCredentialRotatorTests : RawCredentialRetrieverTests() {
     @BeforeEach
     fun setUp() {
-        retrieverForExistent = CloudStorageRetriever(
-            storage = StorageOptions.getDefaultInstance().service,
-            bucketName = "boclips-terraform-channels-test"
-        )
-        retrieverForMissing = CloudStorageRetriever(
-            storage = StorageOptions.getDefaultInstance().service,
-            bucketName = "boclips-terraform-channels-test"
-        )
+        retrieverForExistent = IamCredentialRotator()
+        retrieverForMissing = IamCredentialRotator()
     }
 }
 
@@ -35,8 +29,14 @@ abstract class RawCredentialRetrieverTests {
 
     @Test
     fun `retrieves credential that exists`() {
-        assertThat(retrieverForExistent!!.get("3blue1brown"))
-            .isEqualTo(RawCredential(id = "AKIADEFOANAMAZONID1", secret = "password1"))
+        val credential = retrieverForExistent!!.get("terry-rotation-tests")
+        when (credential) {
+            is RawCredential -> {
+                assertThat(credential.id).startsWith("AKIA")
+                assertThat(credential.secret).isNotBlank()
+            }
+            RawCredentialNotFound -> fail<String>("Should have got a RawCredential!")
+        }
     }
 
     @Test

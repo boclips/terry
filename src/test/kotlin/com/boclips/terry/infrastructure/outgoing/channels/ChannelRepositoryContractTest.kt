@@ -1,5 +1,9 @@
 package com.boclips.terry.infrastructure.outgoing.channels
 
+import com.amazonaws.auth.EnvironmentVariableCredentialsProvider
+import com.amazonaws.regions.Regions
+import com.amazonaws.services.identitymanagement.AmazonIdentityManagementAsyncClientBuilder
+import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -26,6 +30,21 @@ class AWSChannelRepositoryTest : ChannelRepositoryTest() {
     @BeforeEach
     internal fun setUp() {
         channelRepository = AWSChannelRepository()
+    }
+
+    @Test
+    fun `the user can access the bucket`() {
+        val s3 = AmazonS3ClientBuilder
+            .standard()
+            .withRegion(Regions.EU_WEST_1)
+            .withCredentials(EnvironmentVariableCredentialsProvider())
+            .build()
+
+//        val iam = AmazonIdentityManagementAsyncClientBuilder
+//            .standard()
+//            .withRegion(Regions.EU_WEST_1)
+//            .withCredentials()
+
     }
 }
 
