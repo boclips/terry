@@ -12,22 +12,21 @@ class IamCredentialRotator : RawCredentialRetriever {
             .withRegion(Regions.EU_WEST_1)
             .withCredentials(EnvironmentVariableCredentialsProvider())
             .build()
+
         try {
             val accessKey = iam.createAccessKey(CreateAccessKeyRequest(channelName)).accessKey
-            val accessKeyId = accessKey.accessKeyId
-            val secretAccessKey = accessKey.secretAccessKey
-            return RawCredential(id = accessKeyId, secret = secretAccessKey)
+            return RawCredential(id = accessKey.accessKeyId, secret = accessKey.secretAccessKey)
         } catch (e: LimitExceededException) {
-            val keys = iam.listAccessKeys(ListAccessKeysRequest().withUserName(channelName))
-            val metadata: List<AccessKeyMetadata> = keys.accessKeyMetadata
+            val listKeysRequest = ListAccessKeysRequest().withUserName(channelName)
+            val oldestKey = iam.listAccessKeys(listKeysRequest).accessKeyMetadata
+                .sortedBy { it.createDate }
+                .first()
+                .accessKeyId
+
             iam.deleteAccessKey(
                 DeleteAccessKeyRequest()
                     .withUserName(channelName)
-                    .withAccessKeyId(
-                        metadata.sortedBy { it.createDate }
-                            .first()
-                            .accessKeyId
-                    )
+                    .withAccessKeyId(oldestKey)
             )
             return get(channelName)
         } catch (e: NoSuchEntityException) {
