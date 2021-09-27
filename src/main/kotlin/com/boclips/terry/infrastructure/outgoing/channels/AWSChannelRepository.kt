@@ -13,13 +13,18 @@ class AWSChannelRepository : ChannelRepository {
         .build()
 
     override fun create(name: String): ChannelCreationResponse {
+        //creating the bucket
+
+        //creating the user
+
+        //creating the policy
+
         try {
             s3.createBucket(bucketName(name))
         } catch (e: IllegalBucketNameException) {
             return InvalidName
         }
-
-        return ChannelCreationSuccess
+        return ChannelCreationSuccess("blah")
     }
 
     override fun delete(name: String): ChannelDeletionResponse {

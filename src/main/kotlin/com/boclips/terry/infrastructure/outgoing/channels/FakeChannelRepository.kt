@@ -5,7 +5,7 @@ class FakeChannelRepository : ChannelRepository {
         if (name.contains("!")) {
             InvalidName
         } else {
-            ChannelCreationSuccess
+            ChannelCreationSuccess(user = name)
         }
 
     override fun delete(name: String): ChannelDeletionResponse =

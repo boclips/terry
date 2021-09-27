@@ -81,7 +81,7 @@ class TerryTests {
             is ChannelCreation ->
                 assertThat(
                     action.onComplete(
-                        ChannelCreationSuccess
+                        ChannelCreationSuccess(user = "mythology-and-fiction_explained")
                     )
                 )
                     .isEqualTo(

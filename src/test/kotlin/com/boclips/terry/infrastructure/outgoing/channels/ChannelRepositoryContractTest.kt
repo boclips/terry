@@ -16,7 +16,7 @@ abstract class ChannelRepositoryTest {
         assertThat(channelRepository!!.delete("test-test-test")).
             isEqualTo(ChannelDeletionSuccess)
         assertThat(channelRepository!!.create("test-test-test"))
-            .isEqualTo(ChannelCreationSuccess)
+            .isEqualTo(ChannelCreationSuccess(user = "test-test-test"))
     }
 
     @Test
@@ -33,6 +33,14 @@ class AWSChannelRepositoryTest : ChannelRepositoryTest() {
     }
 
     @Test
+    fun `creates user and returns for the bucket`() {
+        val channelName = "channel-name"
+        val creationResponse = channelRepository!!.create(channelName)
+
+        assertThat((creationResponse as ChannelCreationSuccess).user).isEqualTo(channelName)
+    }
+
+    @Test
     fun `the user can access the bucket`() {
         val s3 = AmazonS3ClientBuilder
             .standard()
@@ -44,7 +52,10 @@ class AWSChannelRepositoryTest : ChannelRepositoryTest() {
 //            .standard()
 //            .withRegion(Regions.EU_WEST_1)
 //            .withCredentials()
+    }
 
+    @Test
+    fun `the user cannot access other buckets`() {
     }
 }
 
