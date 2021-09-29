@@ -1,6 +1,5 @@
 package com.boclips.terry.application
 
-import com.boclips.terry.infrastructure.outgoing.channels.ChannelCreationSuccess
 import com.boclips.terry.infrastructure.outgoing.storage.FakeStorageRepository
 import com.boclips.terry.infrastructure.outgoing.users.FakeUserRepository
 import org.assertj.core.api.Assertions.assertThat

@@ -2,12 +2,14 @@ package com.boclips.terry.config
 
 import com.boclips.kalturaclient.KalturaClient
 import com.boclips.kalturaclient.TestKalturaClient
+import com.boclips.terry.application.CreateChannelStorage
 import com.boclips.terry.infrastructure.Clock
 import com.boclips.terry.infrastructure.FakeClock
 import com.boclips.terry.infrastructure.outgoing.storage.StorageRepository
 import com.boclips.terry.infrastructure.outgoing.storage.FakeStorageRepository
 import com.boclips.terry.infrastructure.outgoing.slack.FakeSlackPoster
 import com.boclips.terry.infrastructure.outgoing.slack.SlackPoster
+import com.boclips.terry.infrastructure.outgoing.users.FakeUserRepository
 import com.boclips.terry.infrastructure.outgoing.videos.FakeVideoService
 import com.boclips.terry.infrastructure.outgoing.videos.VideoService
 import org.springframework.context.annotation.Bean
@@ -19,7 +21,7 @@ import org.springframework.context.annotation.Profile
 @Profile("test")
 class TestContext {
     @Bean
-    fun channelRepository(): StorageRepository = FakeStorageRepository()
+    fun createChannel(): CreateChannelStorage= CreateChannelStorage(storageRepository = FakeStorageRepository(), userRepository = FakeUserRepository() )
 
     @Bean
     fun fakeSlackPoster(): SlackPoster = FakeSlackPoster()

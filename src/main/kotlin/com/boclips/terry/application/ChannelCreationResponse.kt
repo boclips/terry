@@ -1,4 +1,4 @@
-package com.boclips.terry.infrastructure.outgoing.channels
+package com.boclips.terry.application
 
 sealed class ChannelCreationResponse
 

@@ -4,24 +4,15 @@ import com.amazonaws.auth.EnvironmentVariableCredentialsProvider
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import com.amazonaws.services.s3.model.IllegalBucketNameException
-import com.boclips.terry.infrastructure.outgoing.channels.ChannelDeletionResponse
-import com.boclips.terry.infrastructure.outgoing.channels.ChannelDeletionSuccess
 
-class AWSStorageRepository() : StorageRepository {
-    val s3 = AmazonS3ClientBuilder
+class AWSStorageRepository : StorageRepository {
+    private val s3 = AmazonS3ClientBuilder
         .standard()
         .withRegion(Regions.EU_WEST_1)
         .withCredentials(EnvironmentVariableCredentialsProvider())
         .build()
 
-    override fun create(name: String): StorageCreationResponse
-    {
-        //creating the bucket
-
-        //creating the user
-
-        //creating the policy
-
+    override fun create(name: String): StorageCreationResponse {
         val bucketName = bucketName(name)
         try {
             s3.createBucket(bucketName)
@@ -32,9 +23,13 @@ class AWSStorageRepository() : StorageRepository {
         return StorageCreationSuccess(bucketName)
     }
 
-    override fun delete(name: String): ChannelDeletionResponse {
-        s3.deleteBucket(bucketName(name))
-        return ChannelDeletionSuccess
+    override fun delete(name: String): StorageDeletionResponse {
+        try {
+            s3.deleteBucket(bucketName(name))
+        } catch (ex: Exception) {
+            return StorageDeletionFailed
+        }
+        return StorageDeletionSuccess
     }
 
     private fun bucketName(name: String) = "boclips-upload-$name"

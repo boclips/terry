@@ -1,7 +1,6 @@
 package com.boclips.terry.application
 
 import com.boclips.terry.infrastructure.incoming.*
-import com.boclips.terry.infrastructure.outgoing.channels.ChannelCreationSuccess
 import com.boclips.terry.infrastructure.outgoing.securecredentials.CredentialNotFound
 import com.boclips.terry.infrastructure.outgoing.securecredentials.SafenoteFailure
 import com.boclips.terry.infrastructure.outgoing.securecredentials.SecureCredential

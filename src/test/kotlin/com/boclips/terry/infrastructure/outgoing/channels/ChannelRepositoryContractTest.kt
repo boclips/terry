@@ -1,25 +1,18 @@
 package com.boclips.terry.infrastructure.outgoing.channels
 
-import com.amazonaws.auth.EnvironmentVariableCredentialsProvider
-import com.amazonaws.regions.Regions
-import com.amazonaws.services.s3.AmazonS3ClientBuilder
-import com.boclips.terry.infrastructure.outgoing.storage.AWSStorageRepository
-import com.boclips.terry.infrastructure.outgoing.storage.FakeStorageRepository
-import com.boclips.terry.infrastructure.outgoing.storage.StorageRepository
-import com.boclips.terry.infrastructure.outgoing.users.IamUserRepository
+import com.boclips.terry.infrastructure.outgoing.storage.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 abstract class StorageRepositoryTest {
     var storageRepository: StorageRepository? = null
+    var newBucketName: String? = null
 
     @Test
     fun `it returns a successful creation response when successful`() {
-        assertThat(storageRepository!!.delete("test-test-test")).
-            isEqualTo(ChannelDeletionSuccess)
-        assertThat(storageRepository!!.create("test-test-test"))
-            .isEqualTo(ChannelCreationSuccess(storageName = "test-test-test"))
+        assertThat(storageRepository!!.create(newBucketName!!))
+            .isEqualTo(StorageCreationSuccess(name = "boclips-upload-$newBucketName"))
     }
 
     @Test
@@ -27,44 +20,29 @@ abstract class StorageRepositoryTest {
         assertThat(storageRepository!!.create("cannothave!exclamation"))
             .isEqualTo(InvalidName)
     }
+
+    @Test
+    fun `cannot delete non existent buckets`() {
+        val name = "channel-bucket-name-that-doesnt-exist-and-will-never-exist"
+        val deletionResponse = storageRepository!!.delete(name)
+        assertThat(deletionResponse).isInstanceOf(StorageDeletionFailed::class.java)
+    }
 }
 
 class AWSStorageRepositoryTest : StorageRepositoryTest() {
     @BeforeEach
-    internal fun setUp() {
+    fun setUp() {
         storageRepository = AWSStorageRepository()
-    }
-
-    @Test
-    fun `creates user and returns for the bucket`() {
-        val channelName = "channel-name1"
-        val creationResponse = storageRepository!!.create(channelName)
-
-        assertThat((creationResponse as ChannelCreationSuccess).storageName).isEqualTo(channelName)
-    }
-
-    @Test
-    fun `the user can access the bucket`() {
-        val s3 = AmazonS3ClientBuilder
-            .standard()
-            .withRegion(Regions.EU_WEST_1)
-            .withCredentials(EnvironmentVariableCredentialsProvider())
-            .build()
-
-//        val iam = AmazonIdentityManagementAsyncClientBuilder
-//            .standard()
-//            .withRegion(Regions.EU_WEST_1)
-//            .withCredentials()
-    }
-
-    @Test
-    fun `the user cannot access other buckets`() {
+        newBucketName = "test-test-testing"
+        storageRepository!!.delete(newBucketName!!)
     }
 }
 
 class FakeStorageRepositoryTest : StorageRepositoryTest() {
     @BeforeEach
-    internal fun setUp() {
+    fun setUp() {
         storageRepository = FakeStorageRepository()
+        newBucketName = "test-test-testing"
+        storageRepository!!.delete(newBucketName!!)
     }
 }

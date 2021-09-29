@@ -1,7 +1,6 @@
 package com.boclips.terry.application
 
 import com.boclips.terry.infrastructure.incoming.RawSlackRequest
-import com.boclips.terry.infrastructure.outgoing.channels.ChannelCreationResponse
 import com.boclips.terry.infrastructure.outgoing.securecredentials.SecureCredentialResponse
 import com.boclips.terry.infrastructure.outgoing.slack.SlackMessage
 import com.boclips.terry.infrastructure.outgoing.transcripts.TaggingResponse

@@ -12,7 +12,7 @@ abstract class UserRepositoryTest {
         val createResult = userRepository!!.create("my-test-user")
         assertThat(createResult).isInstanceOf(UserCreated::class.java)
         assertThat((createResult as UserCreated).username).isEqualTo("my-test-user")
-        assertThat(createResult.userId).startsWith("AIDAY")
+        assertThat(createResult.userId).startsWith("AIDA")
     }
 }
 
