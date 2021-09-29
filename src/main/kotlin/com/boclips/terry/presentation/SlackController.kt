@@ -4,7 +4,7 @@ import com.boclips.kalturaclient.KalturaClient
 import com.boclips.terry.application.*
 import com.boclips.terry.infrastructure.incoming.Malformed
 import com.boclips.terry.infrastructure.incoming.SlackRequest
-import com.boclips.terry.infrastructure.outgoing.channels.ChannelRepository
+import com.boclips.terry.infrastructure.outgoing.storage.StorageRepository
 import com.boclips.terry.infrastructure.outgoing.securecredentials.SecureCredentialRetriever
 import com.boclips.terry.infrastructure.outgoing.slack.SlackPoster
 import com.boclips.terry.infrastructure.outgoing.videos.VideoService
@@ -28,7 +28,7 @@ class SlackController(
     private val kalturaClient: KalturaClient,
     private val retriever: SecureCredentialRetriever,
     private val objectMapper: ObjectMapper,
-    private val channelRepository: ChannelRepository
+    private val createChannelStorage: CreateChannelStorage
 ) {
     companion object : KLogging()
 
@@ -122,7 +122,7 @@ class SlackController(
         videoService = videoService,
         kalturaClient = kalturaClient,
         retriever = retriever,
-        channelRepository = channelRepository
+        createChannelStorage = createChannelStorage
     )
 
     private fun ok(obj: ControllerResponse = Success) =

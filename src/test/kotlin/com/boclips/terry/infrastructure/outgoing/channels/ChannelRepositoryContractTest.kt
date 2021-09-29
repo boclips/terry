@@ -2,42 +2,45 @@ package com.boclips.terry.infrastructure.outgoing.channels
 
 import com.amazonaws.auth.EnvironmentVariableCredentialsProvider
 import com.amazonaws.regions.Regions
-import com.amazonaws.services.identitymanagement.AmazonIdentityManagementAsyncClientBuilder
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
+import com.boclips.terry.infrastructure.outgoing.storage.AWSStorageRepository
+import com.boclips.terry.infrastructure.outgoing.storage.FakeStorageRepository
+import com.boclips.terry.infrastructure.outgoing.storage.StorageRepository
+import com.boclips.terry.infrastructure.outgoing.users.IamUserRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-abstract class ChannelRepositoryTest {
-    var channelRepository: ChannelRepository? = null
+abstract class StorageRepositoryTest {
+    var storageRepository: StorageRepository? = null
 
     @Test
     fun `it returns a successful creation response when successful`() {
-        assertThat(channelRepository!!.delete("test-test-test")).
+        assertThat(storageRepository!!.delete("test-test-test")).
             isEqualTo(ChannelDeletionSuccess)
-        assertThat(channelRepository!!.create("test-test-test"))
-            .isEqualTo(ChannelCreationSuccess(user = "test-test-test"))
+        assertThat(storageRepository!!.create("test-test-test"))
+            .isEqualTo(ChannelCreationSuccess(storageName = "test-test-test"))
     }
 
     @Test
     fun `it returns a failure about the user when username is invalid`() {
-        assertThat(channelRepository!!.create("cannothave!exclamation"))
+        assertThat(storageRepository!!.create("cannothave!exclamation"))
             .isEqualTo(InvalidName)
     }
 }
 
-class AWSChannelRepositoryTest : ChannelRepositoryTest() {
+class AWSStorageRepositoryTest : StorageRepositoryTest() {
     @BeforeEach
     internal fun setUp() {
-        channelRepository = AWSChannelRepository()
+        storageRepository = AWSStorageRepository()
     }
 
     @Test
     fun `creates user and returns for the bucket`() {
-        val channelName = "channel-name"
-        val creationResponse = channelRepository!!.create(channelName)
+        val channelName = "channel-name1"
+        val creationResponse = storageRepository!!.create(channelName)
 
-        assertThat((creationResponse as ChannelCreationSuccess).user).isEqualTo(channelName)
+        assertThat((creationResponse as ChannelCreationSuccess).storageName).isEqualTo(channelName)
     }
 
     @Test
@@ -59,9 +62,9 @@ class AWSChannelRepositoryTest : ChannelRepositoryTest() {
     }
 }
 
-class FakeChannelRepositoryTest : ChannelRepositoryTest() {
+class FakeStorageRepositoryTest : StorageRepositoryTest() {
     @BeforeEach
     internal fun setUp() {
-        channelRepository = FakeChannelRepository()
+        storageRepository = FakeStorageRepository()
     }
 }

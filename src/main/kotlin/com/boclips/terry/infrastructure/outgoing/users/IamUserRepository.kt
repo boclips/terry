@@ -14,12 +14,12 @@ class IamUserRepository : UserRepository {
             .withRegion(Regions.EU_WEST_1)
             .withCredentials(EnvironmentVariableCredentialsProvider())
             .build()
-        try {
+        return try {
             val createdUser = iam.createUser(CreateUserRequest().withUserName(user))
-            return UserCreated(username = createdUser.user.userName, userId = createdUser.user.userId)
+            UserCreated(username = createdUser.user.userName, userId = createdUser.user.userId)
         } catch (ex: EntityAlreadyExistsException) {
             val existingUser = iam.getUser(GetUserRequest().withUserName(user))
-            return UserCreated(username = existingUser.user.userName, userId = existingUser.user.userId)
+            UserCreated(username = existingUser.user.userName, userId = existingUser.user.userId)
         }
     }
 }
