@@ -1,6 +1,5 @@
-package com.boclips.terry.infrastructure.outgoing.channels
+package com.boclips.terry.infrastructure.outgoing.storage
 
-import com.boclips.terry.infrastructure.outgoing.storage.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
