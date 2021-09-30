@@ -4,9 +4,16 @@ class FakePolicyRepository : PolicyRepository {
     val policies = mutableListOf<String>()
 
     override fun create(storageName: String): String? {
-
-        return null
+        val arn = getPolicyArn(storageName)
+        policies.add(arn)
+        return arn
     }
 
-    fun existsFor(channelStorageName: String) = policies.contains(channelStorageName)
+    override fun delete(policyName: String): Boolean =
+        policies.remove(getPolicyArn(policyName))
+
+
+    private fun getPolicyArn(storageName: String) = "arn:aws:::s3:${storageName}"
+
+    fun existsFor(channelStorageName: String) = policies.contains(getPolicyArn(channelStorageName))
 }
