@@ -20,7 +20,7 @@ abstract class UserRepositoryTest {
     @Test
     fun `adds a policy to user`() {
         userRepository!!.create("my-test-user")
-        policyId = IamPolicyRepository().create("my-test-policy")
+        policyId = IamPolicyRepository().createOrGet("my-test-policy")
         val addPolicyToUserResult = userRepository!!.addPolicyToUser("my-test-user", policyId!!)
 
         assertThat(addPolicyToUserResult).isTrue

@@ -13,7 +13,7 @@ class IamPolicyRepository : PolicyRepository {
         .withCredentials(EnvironmentVariableCredentialsProvider())
         .build()
 
-    override fun create(storageName: String): String? = try {
+    override fun createOrGet(storageName: String): String? = try {
         iam.createPolicy(
             CreatePolicyRequest()
                 .withPolicyName(storageName)

@@ -19,7 +19,7 @@ class CreateChannelStorage(
 
                     userRepository.create(name).let {
                         val username = (it as UserCreated).username
-                        policyRepository.create(storageName)?.let { policyId ->
+                        policyRepository.createOrGet(storageName)?.let { policyId ->
                             userRepository.addPolicyToUser(username, policyId)
                             ChannelCreationSuccess(
                                 storageName = storageName,
