@@ -5,7 +5,6 @@ import com.amazonaws.regions.Regions
 import com.amazonaws.services.identitymanagement.AmazonIdentityManagementClientBuilder
 import com.amazonaws.services.identitymanagement.model.CreatePolicyRequest
 import com.amazonaws.services.identitymanagement.model.DeletePolicyRequest
-import com.amazonaws.services.identitymanagement.model.DetachUserPolicyRequest
 
 class IamPolicyRepository : PolicyRepository {
     val iam = AmazonIdentityManagementClientBuilder
@@ -14,12 +13,15 @@ class IamPolicyRepository : PolicyRepository {
         .withCredentials(EnvironmentVariableCredentialsProvider())
         .build()
 
-    override fun create(storageName: String): String? =
+    override fun create(storageName: String): String? = try {
         iam.createPolicy(
             CreatePolicyRequest()
                 .withPolicyName(storageName)
                 .withPolicyDocument(policyGenerator(storageName))
         ).policy.arn
+    } catch (ex: Exception) {
+        iam.listPolicies().policies.find { it.policyName == storageName }?.arn
+    }
 
     override fun delete(policyId: String): Boolean {
         return iam.deletePolicy(DeletePolicyRequest().withPolicyArn(policyId))?.let {

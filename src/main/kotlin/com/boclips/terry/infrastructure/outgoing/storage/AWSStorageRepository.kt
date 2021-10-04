@@ -3,6 +3,7 @@ package com.boclips.terry.infrastructure.outgoing.storage
 import com.amazonaws.auth.EnvironmentVariableCredentialsProvider
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
+import com.amazonaws.services.s3.model.AmazonS3Exception
 import com.amazonaws.services.s3.model.IllegalBucketNameException
 
 class AWSStorageRepository : StorageRepository {
@@ -18,8 +19,13 @@ class AWSStorageRepository : StorageRepository {
             s3.createBucket(bucketName)
         } catch (e: IllegalBucketNameException) {
             return InvalidName
+        } catch (e: AmazonS3Exception) {
+            return if (e.errorCode == "BucketAlreadyOwnedByYou") {
+                StorageAlreadyExists
+            } else {
+                StorageCreationFailure(e.message ?: "Storage creation failed!")
+            }
         }
-
         return StorageCreationSuccess(bucketName)
     }
 

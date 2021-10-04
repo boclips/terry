@@ -29,7 +29,7 @@ abstract class RawCredentialRetrieverTests {
 
     @Test
     fun `retrieves credential that exists`() {
-        val credential = retrieverForExistent!!.get("terry-rotation-tests")
+        val credential = retrieverForExistent!!.get("channel-name")
         when (credential) {
             is RawCredential -> {
                 assertThat(credential.id).startsWith("AKIA")

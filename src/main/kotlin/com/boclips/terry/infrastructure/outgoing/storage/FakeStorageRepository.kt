@@ -7,11 +7,17 @@ class FakeStorageRepository : StorageRepository {
     override fun create(name: String): StorageCreationResponse =
         if (name.contains("!")) {
             InvalidName
+        } else if (storageNames.contains(getBucketName(name))) {
+            StorageAlreadyExists
         } else {
-            val bucketName = "boclips-upload-$name"
+            val bucketName = getBucketName(name)
             storageNames.add(bucketName)
             StorageCreationSuccess(name = bucketName)
         }
+
+    private fun getBucketName(name: String): String {
+        return "boclips-upload-$name"
+    }
 
     override fun delete(name: String): StorageDeletionResponse {
         if (exists(name)) {

@@ -34,8 +34,5 @@ class FakePolicyRepositoryTest : PolicyRepositoryContractTest() {
     @BeforeEach
     fun setUp() {
         policyRepository = FakePolicyRepository()
-        (policyRepository as FakePolicyRepository).delete("boclips-upload-test")
-        policyRepository?.create("boclips-upload-channel-name1")
-
     }
 }

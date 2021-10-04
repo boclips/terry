@@ -10,6 +10,7 @@ import com.boclips.terry.infrastructure.outgoing.users.FakeUserRepository
 import com.boclips.terry.infrastructure.outgoing.users.IamUserRepository
 import com.boclips.terry.infrastructure.outgoing.users.UserRepository
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -26,13 +27,14 @@ abstract class CreateChannelStorageTest {
 
         assertThat(createdChannelStorage).isInstanceOf(ChannelCreationSuccess::class.java)
         assertThat(createdChannelStorage.storageName).isEqualTo("boclips-upload-channel-name")
-        assertThat(createdChannelStorage.userName).isEqualTo("boclips-upload-channel-name")
-        assertThat(createdChannelStorage.policyName).isEqualTo("boclips-upload-channel-name")
+        assertThat(createdChannelStorage.userName).isEqualTo("channel-name")
+        assertThat(createdChannelStorage.policyName).startsWith("arn:aws:iam::")
+        assertThat(createdChannelStorage.policyName).endsWith("boclips-upload-channel-name")
     }
 
     @Test
     fun `should handle channels that exist already`() {
-        val createdChannelStorage = createChannelStorage!!("channel-name") as ChannelAlreadyExists
+        val createdChannelStorage = createChannelStorage!!("already-existing-channel") as ChannelAlreadyExists
 
         assertThat(createdChannelStorage).isInstanceOf(ChannelAlreadyExists::class.java)
     }
@@ -41,8 +43,11 @@ class CreateAWSStorageTest : CreateChannelStorageTest() {
     @BeforeEach
     fun setUp () {
         storageRepository = AWSStorageRepository()
+        (storageRepository as AWSStorageRepository).create("already-existing-channel")
+        storageRepository!!.delete("channel-name")
         userRepository = IamUserRepository()
         policyRepository = IamPolicyRepository()
+
         createChannelStorage = CreateChannelStorage(storageRepository!!, policyRepository!!, userRepository!!)
     }
 }
@@ -51,7 +56,9 @@ class CreateFakeStorageTest : CreateChannelStorageTest() {
     @BeforeEach
     fun setUp () {
         storageRepository = FakeStorageRepository()
+        (storageRepository as FakeStorageRepository).create("already-existing-channel")
         userRepository = FakeUserRepository()
         policyRepository = FakePolicyRepository()
+        createChannelStorage = CreateChannelStorage(storageRepository!!, policyRepository!!, userRepository!!)
     }
 }

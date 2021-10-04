@@ -22,8 +22,8 @@ abstract class StorageRepositoryTest {
 
     @Test
     fun `it returns a already exists error when bucket exists`() {
-        assertThat(storageRepository!!.create("cannothave!exclamation"))
-            .isEqualTo(InvalidName)
+        assertThat(storageRepository!!.create("existing-channel-name"))
+            .isEqualTo(StorageAlreadyExists)
     }
 
     @Test
@@ -49,5 +49,6 @@ class FakeStorageRepositoryTest : StorageRepositoryTest() {
         storageRepository = FakeStorageRepository()
         newBucketName = "test-test-testing"
         storageRepository!!.delete(newBucketName!!)
+        storageRepository!!.create("existing-channel-name")
     }
 }
