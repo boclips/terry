@@ -21,6 +21,12 @@ abstract class StorageRepositoryTest {
     }
 
     @Test
+    fun `it returns a already exists error when bucket exists`() {
+        assertThat(storageRepository!!.create("cannothave!exclamation"))
+            .isEqualTo(InvalidName)
+    }
+
+    @Test
     fun `cannot delete non existent buckets`() {
         val name = "channel-bucket-name-that-doesnt-exist-and-will-never-exist"
         val deletionResponse = storageRepository!!.delete(name)

@@ -1,8 +1,11 @@
 package com.boclips.terry.application
 
 import com.boclips.terry.infrastructure.outgoing.policy.PolicyRepository
+import com.boclips.terry.infrastructure.outgoing.storage.InvalidName
+import com.boclips.terry.infrastructure.outgoing.storage.StorageAlreadyExists
 import com.boclips.terry.infrastructure.outgoing.storage.StorageCreationSuccess
 import com.boclips.terry.infrastructure.outgoing.storage.StorageRepository
+import com.boclips.terry.infrastructure.outgoing.users.UserCreated
 import com.boclips.terry.infrastructure.outgoing.users.UserRepository
 
 class CreateChannelStorage(
@@ -12,10 +15,29 @@ class CreateChannelStorage(
 ) {
 
     operator fun invoke(name: String): ChannelCreationResponse {
-        val createdStorage = storageRepository.create(name)
+        storageRepository.create(name).let { storageCreationResult ->
+            return when (storageCreationResult) {
+                is StorageCreationSuccess -> {
+                    val storageName = storageCreationResult.name
 
-        userRepository.create(name)
-
-        return ChannelCreationSuccess((createdStorage as? StorageCreationSuccess)!!.name)
+                    userRepository.create(name).let {
+                        val username = (it as UserCreated).username
+                        policyRepository.create(storageName)?.let { policyId ->
+                            userRepository.addPolicyToUser(username, policyId)
+                            ChannelCreationSuccess(
+                                storageName = storageName,
+                                userName = username,
+                                policyName = policyId
+                            )
+                        } ?: InvalidPolicyName
+                    }
+                }
+                is InvalidName -> {
+                    InvalidChannelName
+                }
+                is StorageAlreadyExists ->
+                    ChannelAlreadyExists
+            }
+        }
     }
 }

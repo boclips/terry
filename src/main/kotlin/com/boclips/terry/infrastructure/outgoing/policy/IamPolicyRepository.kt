@@ -5,6 +5,7 @@ import com.amazonaws.regions.Regions
 import com.amazonaws.services.identitymanagement.AmazonIdentityManagementClientBuilder
 import com.amazonaws.services.identitymanagement.model.CreatePolicyRequest
 import com.amazonaws.services.identitymanagement.model.DeletePolicyRequest
+import com.amazonaws.services.identitymanagement.model.DetachUserPolicyRequest
 
 class IamPolicyRepository : PolicyRepository {
     val iam = AmazonIdentityManagementClientBuilder
@@ -17,14 +18,12 @@ class IamPolicyRepository : PolicyRepository {
         iam.createPolicy(
             CreatePolicyRequest()
                 .withPolicyName(storageName)
-                .withPolicyDocument(policyGenerator(storageName))).policy.arn
+                .withPolicyDocument(policyGenerator(storageName))
+        ).policy.arn
 
-    override fun delete(policyName: String): Boolean {
-        val arnToDelete = iam.listPolicies().policies.find { it.policyName == policyName }?.arn
-        return arnToDelete?.let {
-            iam.deletePolicy(DeletePolicyRequest().withPolicyArn(arnToDelete))?.let {
-                it.sdkHttpMetadata.httpStatusCode == 200
-            }
+    override fun delete(policyId: String): Boolean {
+        return iam.deletePolicy(DeletePolicyRequest().withPolicyArn(policyId))?.let {
+            it.sdkHttpMetadata.httpStatusCode == 200
         } ?: false
     }
 

@@ -3,18 +3,16 @@ package com.boclips.terry.infrastructure.outgoing.users
 import com.amazonaws.auth.EnvironmentVariableCredentialsProvider
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.identitymanagement.AmazonIdentityManagementClientBuilder
-import com.amazonaws.services.identitymanagement.model.AttachUserPolicyRequest
-import com.amazonaws.services.identitymanagement.model.CreateUserRequest
-import com.amazonaws.services.identitymanagement.model.EntityAlreadyExistsException
-import com.amazonaws.services.identitymanagement.model.GetUserRequest
+import com.amazonaws.services.identitymanagement.model.*
 
 class IamUserRepository : UserRepository {
+    private val iam = AmazonIdentityManagementClientBuilder
+        .standard()
+        .withRegion(Regions.EU_WEST_1)
+        .withCredentials(EnvironmentVariableCredentialsProvider())
+        .build()
+
     override fun create(user: String): UserCreationResponse {
-        val iam = AmazonIdentityManagementClientBuilder
-            .standard()
-            .withRegion(Regions.EU_WEST_1)
-            .withCredentials(EnvironmentVariableCredentialsProvider())
-            .build()
         return try {
             val createdUser = iam.createUser(CreateUserRequest().withUserName(user))
             UserCreated(username = createdUser.user.userName, userId = createdUser.user.userId)
@@ -23,4 +21,19 @@ class IamUserRepository : UserRepository {
             UserCreated(username = existingUser.user.userName, userId = existingUser.user.userId)
         }
     }
+
+    override fun addPolicyToUser(userName: String, policyId: String): Boolean {
+        val attachUserPolicy = iam.attachUserPolicy(
+            AttachUserPolicyRequest()
+                .withUserName(userName)
+                .withPolicyArn(policyId)
+        )
+
+        return attachUserPolicy.sdkHttpMetadata.httpStatusCode == 200
+    }
+
+    override fun removePolicyFromUser(userName: String, policyId: String): Boolean =
+        iam.detachUserPolicy(
+            DetachUserPolicyRequest().withPolicyArn(policyId).withUserName(userName)
+        ).sdkHttpMetadata.httpStatusCode == 200
 }

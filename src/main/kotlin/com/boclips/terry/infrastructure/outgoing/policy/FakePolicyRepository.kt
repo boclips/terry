@@ -9,8 +9,8 @@ class FakePolicyRepository : PolicyRepository {
         return arn
     }
 
-    override fun delete(policyName: String): Boolean =
-        policies.remove(getPolicyArn(policyName))
+    override fun delete(policyId: String): Boolean =
+        policies.remove(getPolicyArn(policyId))
 
 
     private fun getPolicyArn(storageName: String) = "arn:aws:::s3:${storageName}"

@@ -80,7 +80,7 @@ class TerryTests {
             is ChannelCreation ->
                 assertThat(
                     action.onComplete(
-                        ChannelCreationSuccess(storageName = "mythology-and-fiction_explained")
+                        ChannelCreationSuccess(storageName = "mythology-and-fiction_explained", "","")
                     )
                 )
                     .isEqualTo(
