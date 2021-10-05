@@ -1,9 +1,7 @@
 package com.boclips.terry.presentation
 
 import com.boclips.kalturaclient.KalturaClient
-import com.boclips.terry.application.ChannelUploadCredentialRetrieval
-import com.boclips.terry.application.VideoRetrieval
-import com.boclips.terry.application.VideoTagging
+import com.boclips.terry.application.*
 import com.boclips.terry.infrastructure.outgoing.securecredentials.SecureCredentialRetriever
 import com.boclips.terry.infrastructure.outgoing.slack.PostFailure
 import com.boclips.terry.infrastructure.outgoing.slack.PostSuccess
@@ -17,7 +15,8 @@ open class SlackControllerJobs(
     private val slackPoster: SlackPoster,
     private val videoService: VideoService,
     private val kalturaClient: KalturaClient,
-    private val retriever: SecureCredentialRetriever
+    private val retriever: SecureCredentialRetriever,
+    private val createChannelStorage: CreateChannelStorage
 ) {
     @Async
     open fun getVideo(action: VideoRetrieval) {
@@ -38,11 +37,17 @@ open class SlackControllerJobs(
     }
 
     @Async
-    fun getCredential(action: ChannelUploadCredentialRetrieval) {
+    open fun getCredential(action: ChannelUploadCredentialRetrieval) {
         action
             .onComplete(retriever.get(action.channelName))
             .apply { chat(slackMessage) }
     }
+
+    @Async
+    open fun createChannelBucket(action: ChannelCreation) =
+        action
+            .onComplete(createChannelStorage(action.channelName))
+            .apply { chat(slackMessage) }
 
     @Async
     open fun chat(slackMessage: SlackMessage, url: String = "https://slack.com/api/chat.postMessage"): Unit =

@@ -114,22 +114,28 @@ class Terry {
             is AppMention -> {
                 extractVideoId(event.text)?.let { videoId ->
                     videoRetrieval(videoId, event)
-                } ?: extractChannelName(event.text)?.let { channelName ->
+                } ?: extractSafenoteChannelName(event.text)?.let { channelName ->
                     channelUploadCredentialRetrieval(channelName, event)
+                } ?: extractChannelCreationChannelName(event.text)?.let { channelName ->
+                    channelCreation(channelName, event)
                 } ?: help(event)
             }
         }
 
-    private fun extractChannelName(text: String): String? =
-        """.*safenote(?: for)? ([a-z0-9-_ ]+).*""".toRegex(RegexOption.IGNORE_CASE).let { pattern ->
-            pattern.matchEntire(text)
-                ?.groups
-                ?.get(1)
-                ?.value
-                ?.toLowerCase()
-                ?.replace(" please.*$".toRegex(), "")
-                ?.replace(" ", "-")
-        }
+    private fun extractChannelCreationChannelName(text: String): String? =
+        extractChannelName(text, """.*(?:bucket|channel)(?: for)? ([a-z0-9-_ ]+).*""")
+
+    private fun extractSafenoteChannelName(text: String): String? =
+        extractChannelName(text, """.*safenote(?: for)? ([a-z0-9-_ ]+).*""")
+
+    private fun extractChannelName(text: String, pattern: String): String? =
+        pattern.toRegex(RegexOption.IGNORE_CASE).matchEntire(text)
+            ?.groups
+            ?.get(1)
+            ?.value
+            ?.toLowerCase()
+            ?.replace(" please.*$".toRegex(), "")
+            ?.replace(" ", "-")
 
     private fun help(event: AppMention) = Decision(
         log = "Responding via chat with \"${helpFor(event.user)}\"",
@@ -139,6 +145,18 @@ class Terry {
                 text = helpFor(event.user)
             )
         )
+    )
+
+    private fun channelCreation(channelName: String, event: AppMention) = Decision(
+        log = "Creating channel $channelName",
+        action = ChannelCreation(channelName) {
+            ChatReply(
+                slackMessage = SlackMessage(
+                    text = """<@${event.user}> I've created "$channelName"! You can now ask me for its safenote.""",
+                    channel = event.channel
+                )
+            )
+        }
     )
 
     private fun channelUploadCredentialRetrieval(channelName: String, event: AppMention) = Decision(

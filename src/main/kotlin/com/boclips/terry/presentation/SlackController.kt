@@ -4,6 +4,7 @@ import com.boclips.kalturaclient.KalturaClient
 import com.boclips.terry.application.*
 import com.boclips.terry.infrastructure.incoming.Malformed
 import com.boclips.terry.infrastructure.incoming.SlackRequest
+import com.boclips.terry.infrastructure.outgoing.storage.StorageRepository
 import com.boclips.terry.infrastructure.outgoing.securecredentials.SecureCredentialRetriever
 import com.boclips.terry.infrastructure.outgoing.slack.SlackPoster
 import com.boclips.terry.infrastructure.outgoing.videos.VideoService
@@ -26,7 +27,8 @@ class SlackController(
     private val videoService: VideoService,
     private val kalturaClient: KalturaClient,
     private val retriever: SecureCredentialRetriever,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    private val createChannelStorage: CreateChannelStorage
 ) {
     companion object : KLogging()
 
@@ -82,6 +84,11 @@ class SlackController(
                     .also {
                         getCredential(action)
                     }
+            is ChannelCreation ->
+                ok()
+                    .also {
+                        createChannelBucket(action)
+                    }
         }
     }
 
@@ -100,6 +107,11 @@ class SlackController(
             .getVideo(action)
     }
 
+    private fun createChannelBucket(action: ChannelCreation) {
+        slackControllerJobs()
+            .createChannelBucket(action)
+    }
+
     private fun chat(action: ChatReply) {
         slackControllerJobs()
             .chat(action.slackMessage)
@@ -109,7 +121,8 @@ class SlackController(
         slackPoster = slackPoster,
         videoService = videoService,
         kalturaClient = kalturaClient,
-        retriever = retriever
+        retriever = retriever,
+        createChannelStorage = createChannelStorage
     )
 
     private fun ok(obj: ControllerResponse = Success) =

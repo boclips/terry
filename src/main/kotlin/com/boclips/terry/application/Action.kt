@@ -32,3 +32,8 @@ data class VideoTagging(
     val onComplete: (TaggingResponse) -> ChatReply,
     val responseUrl: String
 ) : Action()
+
+data class ChannelCreation(
+    val channelName: String,
+    val onComplete: (ChannelCreationResponse) -> ChatReply
+): Action()

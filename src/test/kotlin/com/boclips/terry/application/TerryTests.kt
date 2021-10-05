@@ -52,6 +52,52 @@ class TerryTests {
     }
 
     @Test
+    fun `creates a channel when given a name`() {
+        val decision = mentionTerry(
+            "ChAnNel for mythology-and-fiction_explained please bud?",
+            user = "UBS7V80PR",
+            channel = "#engineering"
+        )
+        assertThat(decision.log).isEqualTo("Creating channel mythology-and-fiction_explained")
+        when (val response = decision.action) {
+            is ChannelCreation -> {
+                assertThat(response.channelName).isEqualTo(
+                    "mythology-and-fiction_explained"
+                )
+            }
+            else ->
+                fail<String>("Expected a channel creation, but got $response")
+        }
+    }
+
+    @Test
+    fun `when channel is created successfully, reply via chat`() {
+        when (val action = mentionTerry(
+            "channel for mythology-and-fiction_explained",
+            user = "THAD123",
+            channel = "#engineering"
+        ).action) {
+            is ChannelCreation ->
+                assertThat(
+                    action.onComplete(
+                        ChannelCreationSuccess(storageName = "mythology-and-fiction_explained", "","")
+                    )
+                )
+                    .isEqualTo(
+                        ChatReply(
+                            slackMessage = SlackMessage(
+                                channel = "#engineering",
+                                text = """<@THAD123> I've created "mythology-and-fiction_explained"! You can now ask me for its safenote."""
+                            )
+                        )
+                    )
+            else ->
+                fail<String>("Expected a channel creation, but got $action")
+        }
+
+    }
+
+    @Test
     fun `retrieves video details when given an ID`() {
         assertAll { videoId: Long ->
             val decision = mentionTerry("I would like video $videoId", channel = "#engineering")
