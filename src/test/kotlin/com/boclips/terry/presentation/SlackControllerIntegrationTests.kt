@@ -249,7 +249,7 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
             .isEqualTo(
                 listOf(
                     SlackMessage(
-                        text = """<@U061F7AUR> I've created "new-channel"! You can now ask me for its safenote.""",
+                        text = """<@U061F7AUR> I've created "new-channel"! You can use "@terrybot safenote new-channel" to generate a safenote.""",
                         channel = "C0LAN2Q65"
                     )
                 )
