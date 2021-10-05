@@ -48,6 +48,9 @@ class TerryTests {
         val reply = decision.action as ChatReply
         assertThat(reply.slackMessage.channel).isEqualTo("#engineering")
         assertThat(reply.slackMessage.text).startsWith("<@UBS7V80PR> Some things you can do:")
+        assertThat(reply.slackMessage.text).contains("video 1234 (retrieves a video and displays a menu)")
+        assertThat(reply.slackMessage.text).contains("safenote a-channel-name (retrieves a new Safenote for an existing channel's upload credentials)")
+        assertThat(reply.slackMessage.text).contains("bucket for a-channel-name (creates a bucket in AWS for a-channel-name)")
         assertThat(decision.log).contains("Some things you can do")
     }
 

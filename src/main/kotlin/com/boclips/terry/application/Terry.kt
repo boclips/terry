@@ -242,6 +242,7 @@ class Terry {
         Some things you can do:
         video 1234 (retrieves a video and displays a menu)
         safenote a-channel-name (retrieves a new Safenote for an existing channel's upload credentials)
+        bucket for a-channel-name (creates a bucket in AWS for a-channel-name)
     """.trimIndent()
 
     private fun replyWithVideo(
