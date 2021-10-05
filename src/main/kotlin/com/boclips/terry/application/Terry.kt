@@ -149,11 +149,19 @@ class Terry {
 
     private fun channelCreation(channelName: String, event: AppMention) = Decision(
         log = "Creating channel $channelName",
-        action = ChannelCreation(channelName) {
+        action = ChannelCreation(channelName) { response ->
+
+            val text = when (response) {
+                is ChannelCreationSuccess -> """<@${event.user}> I've created "$channelName"! You can use "@terrybot safenote $channelName" to generate a safenote."""
+                is ChannelAlreadyExists -> """<@${event.user}> A bucket for that channel already exists. You can use "@terrybot safenote $channelName" to generate a safenote if you'd like, or not."""
+                is InvalidChannelName -> """<@${event.user}> "$channelName" is not a valid bucket name 🪣 😤 🤯"""
+                is ChannelCreationFailed -> """<@${event.user}> could not create a bucket at this time for an unknown reason 🤔"""
+            }
+
             ChatReply(
                 slackMessage = SlackMessage(
-                    text = """<@${event.user}> I've created "$channelName"! You can now ask me for its safenote.""",
-                    channel = event.channel
+                    text = text,
+                    channel = event.channel,
                 )
             )
         }

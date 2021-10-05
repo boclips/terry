@@ -10,6 +10,5 @@ data class ChannelCreationSuccess(
 
 object InvalidChannelName : ChannelCreationResponse()
 object ChannelAlreadyExists : ChannelCreationResponse()
-object InvalidPolicyName : ChannelCreationResponse()
 object ChannelCreationFailed : ChannelCreationResponse()
 

@@ -72,29 +72,79 @@ class TerryTests {
 
     @Test
     fun `when channel is created successfully, reply via chat`() {
-        when (val action = mentionTerry(
+        val action = mentionTerry(
             "channel for mythology-and-fiction_explained",
             user = "THAD123",
             channel = "#engineering"
-        ).action) {
-            is ChannelCreation ->
-                assertThat(
-                    action.onComplete(
-                        ChannelCreationSuccess(storageName = "mythology-and-fiction_explained", "","")
-                    )
-                )
-                    .isEqualTo(
-                        ChatReply(
-                            slackMessage = SlackMessage(
-                                channel = "#engineering",
-                                text = """<@THAD123> I've created "mythology-and-fiction_explained"! You can now ask me for its safenote."""
-                            )
-                        )
-                    )
-            else ->
-                fail<String>("Expected a channel creation, but got $action")
-        }
+        ).action
+        val channelCreationResponse = ChannelCreationSuccess(storageName = "mythology-and-fiction_explained", "", "")
 
+        assertThat(action).isInstanceOf(ChannelCreation::class.java)
+        assertThat((action as ChannelCreation).onComplete(channelCreationResponse)).isEqualTo(
+            ChatReply(
+                slackMessage = SlackMessage(
+                    channel = "#engineering",
+                    text = """<@THAD123> I've created "mythology-and-fiction_explained"! You can use "@terrybot safenote mythology-and-fiction_explained" to generate a safenote."""
+                )
+            )
+        )
+    }
+
+    @Test
+    fun `when channel already exists, reply accordingly via chat`() {
+        val action = mentionTerry(
+            "channel for mythology-and-fiction_explained",
+            user = "THAD123",
+            channel = "#engineering"
+        ).action
+
+        assertThat(action).isInstanceOf(ChannelCreation::class.java)
+        assertThat((action as ChannelCreation).onComplete(ChannelAlreadyExists)).isEqualTo(
+            ChatReply(
+                slackMessage = SlackMessage(
+                    channel = "#engineering",
+                    text = """<@THAD123> A bucket for that channel already exists. You can use "@terrybot safenote mythology-and-fiction_explained" to generate a safenote if you'd like, or not."""
+                )
+            )
+        )
+    }
+
+    @Test
+    fun `when channel name is invalid, reply accordingly via chat`() {
+        val action = mentionTerry(
+            "channel for invalid-name",
+            user = "THAD123",
+            channel = "#engineering"
+        ).action
+
+        assertThat(action).isInstanceOf(ChannelCreation::class.java)
+        assertThat((action as ChannelCreation).onComplete(InvalidChannelName)).isEqualTo(
+            ChatReply(
+                slackMessage = SlackMessage(
+                    channel = "#engineering",
+                    text = """<@THAD123> "invalid-name" is not a valid bucket name 🪣 😤 🤯"""
+                )
+            )
+        )
+    }
+
+    @Test
+    fun `when channel creation fails, reply accordingly via chat`() {
+        val action = mentionTerry(
+            "channel for failed-request",
+            user = "THAD123",
+            channel = "#engineering"
+        ).action
+
+        assertThat(action).isInstanceOf(ChannelCreation::class.java)
+        assertThat((action as ChannelCreation).onComplete(ChannelCreationFailed)).isEqualTo(
+            ChatReply(
+                slackMessage = SlackMessage(
+                    channel = "#engineering",
+                    text = """<@THAD123> could not create a bucket at this time for an unknown reason 🤔"""
+                )
+            )
+        )
     }
 
     @Test

@@ -26,7 +26,7 @@ class CreateChannelStorage(
                                 userName = username,
                                 policyName = policyId
                             )
-                        } ?: InvalidPolicyName
+                        } ?: ChannelCreationFailed
                     }
                 }
                 is InvalidName -> {
