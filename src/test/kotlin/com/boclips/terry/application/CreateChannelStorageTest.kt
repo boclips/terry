@@ -1,5 +1,8 @@
 package com.boclips.terry.application
 
+import com.amazonaws.auth.EnvironmentVariableCredentialsProvider
+import com.amazonaws.regions.Regions
+import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import com.boclips.terry.infrastructure.outgoing.policy.FakePolicyRepository
 import com.boclips.terry.infrastructure.outgoing.policy.IamPolicyRepository
 import com.boclips.terry.infrastructure.outgoing.policy.PolicyRepository
@@ -10,7 +13,6 @@ import com.boclips.terry.infrastructure.outgoing.users.FakeUserRepository
 import com.boclips.terry.infrastructure.outgoing.users.IamUserRepository
 import com.boclips.terry.infrastructure.outgoing.users.UserRepository
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -39,10 +41,17 @@ abstract class CreateChannelStorageTest {
         assertThat(createdChannelStorage).isInstanceOf(ChannelAlreadyExists::class.java)
     }
 }
+
 class CreateAWSStorageTest : CreateChannelStorageTest() {
     @BeforeEach
-    fun setUp () {
-        storageRepository = AWSStorageRepository()
+    fun setUp() {
+        val s3Client = AmazonS3ClientBuilder
+            .standard()
+            .withRegion(Regions.EU_WEST_1)
+            .withCredentials(EnvironmentVariableCredentialsProvider())
+            .build()
+
+        storageRepository = AWSStorageRepository(s3Client)
         (storageRepository as AWSStorageRepository).create("already-existing-channel")
         storageRepository!!.delete("channel-name")
         userRepository = IamUserRepository()
@@ -54,7 +63,7 @@ class CreateAWSStorageTest : CreateChannelStorageTest() {
 
 class CreateFakeStorageTest : CreateChannelStorageTest() {
     @BeforeEach
-    fun setUp () {
+    fun setUp() {
         storageRepository = FakeStorageRepository()
         (storageRepository as FakeStorageRepository).create("already-existing-channel")
         userRepository = FakeUserRepository()

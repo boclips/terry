@@ -1,6 +1,9 @@
 package com.boclips.terry.config
 
-import com.boclips.terry.application.CreateChannelStorage
+import com.amazonaws.auth.EnvironmentVariableCredentialsProvider
+import com.amazonaws.regions.Regions
+import com.amazonaws.services.s3.AmazonS3
+import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import com.boclips.terry.infrastructure.outgoing.policy.IamPolicyRepository
 import com.boclips.terry.infrastructure.outgoing.policy.PolicyRepository
 import com.boclips.terry.infrastructure.outgoing.storage.AWSStorageRepository
@@ -14,14 +17,19 @@ import org.springframework.context.annotation.Profile
 @Profile("!test")
 @Configuration
 class AWSConfig {
-    fun channelRepository(): StorageRepository = AWSStorageRepository()
-    fun policyRepository(): PolicyRepository = IamPolicyRepository()
-    fun userRepository(): UserRepository = IamUserRepository()
+    @Bean
+    fun s3Client(): AmazonS3 = AmazonS3ClientBuilder
+        .standard()
+        .withRegion(Regions.EU_WEST_1)
+        .withCredentials(EnvironmentVariableCredentialsProvider())
+        .build()
 
     @Bean
-    fun createChannel(): CreateChannelStorage = CreateChannelStorage(
-        storageRepository = channelRepository(),
-        userRepository = userRepository(),
-        policyRepository = policyRepository()
-    )
+    fun channelRepository(s3Client: AmazonS3): StorageRepository = AWSStorageRepository(s3Client)
+
+    @Bean
+    fun policyRepository(): PolicyRepository = IamPolicyRepository()
+
+    @Bean
+    fun userRepository(): UserRepository = IamUserRepository()
 }

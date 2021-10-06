@@ -1,5 +1,8 @@
 package com.boclips.terry.infrastructure.outgoing.storage
 
+import com.amazonaws.auth.EnvironmentVariableCredentialsProvider
+import com.amazonaws.regions.Regions
+import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -37,7 +40,13 @@ abstract class StorageRepositoryTest {
 class AWSStorageRepositoryTest : StorageRepositoryTest() {
     @BeforeEach
     fun setUp() {
-        storageRepository = AWSStorageRepository()
+        val s3Client = AmazonS3ClientBuilder
+            .standard()
+            .withRegion(Regions.EU_WEST_1)
+            .withCredentials(EnvironmentVariableCredentialsProvider())
+            .build()
+
+        storageRepository = AWSStorageRepository(s3Client)
         newBucketName = "test-test-testing"
         storageRepository!!.delete(newBucketName!!)
     }
