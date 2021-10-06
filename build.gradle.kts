@@ -37,6 +37,7 @@ dependencies {
 
 	testImplementation("io.kotlintest:kotlintest-runner-junit5:3.3.0")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
 }
 
 tasks.withType<KotlinCompile> {

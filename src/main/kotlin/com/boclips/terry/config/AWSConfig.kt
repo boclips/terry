@@ -7,6 +7,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import com.boclips.terry.infrastructure.outgoing.policy.IamPolicyRepository
 import com.boclips.terry.infrastructure.outgoing.policy.PolicyRepository
 import com.boclips.terry.infrastructure.outgoing.storage.AWSStorageRepository
+import com.boclips.terry.infrastructure.outgoing.storage.NotificationService
 import com.boclips.terry.infrastructure.outgoing.storage.StorageRepository
 import com.boclips.terry.infrastructure.outgoing.users.IamUserRepository
 import com.boclips.terry.infrastructure.outgoing.users.UserRepository
@@ -25,11 +26,15 @@ class AWSConfig {
         .build()
 
     @Bean
-    fun channelRepository(s3Client: AmazonS3): StorageRepository = AWSStorageRepository(s3Client)
+    fun channelRepository(s3Client: AmazonS3, notificationService: NotificationService): StorageRepository =
+        AWSStorageRepository(s3Client, notificationService)
 
     @Bean
     fun policyRepository(): PolicyRepository = IamPolicyRepository()
 
     @Bean
     fun userRepository(): UserRepository = IamUserRepository()
+
+    @Bean
+    fun notificationService(): NotificationService = TODO()
 }

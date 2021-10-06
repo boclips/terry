@@ -4,7 +4,10 @@ import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import com.amazonaws.services.s3.model.IllegalBucketNameException
 
-class AWSStorageRepository(private val s3: AmazonS3) : StorageRepository {
+class AWSStorageRepository(
+    private val s3: AmazonS3,
+    private val notificationService: NotificationService
+) : StorageRepository {
     override fun create(name: String): StorageCreationResponse {
         val bucketName = bucketName(name)
         try {
@@ -18,6 +21,12 @@ class AWSStorageRepository(private val s3: AmazonS3) : StorageRepository {
                 StorageCreationFailure(e.message ?: "Storage creation failed!")
             }
         }
+        // s3.setBucketNotificationConfiguration(
+        //     SetBucketNotificationConfigurationRequest(
+        //         bucketName,
+        //         BucketNotificationConfiguration().addConfiguration("Notify", NotificationConfiguration().addEvent(S3Event.ObjectCreated))
+        //     )
+        // )
         return StorageCreationSuccess(bucketName)
     }
 

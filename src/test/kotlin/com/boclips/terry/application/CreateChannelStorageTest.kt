@@ -51,7 +51,9 @@ class CreateAWSStorageTest : CreateChannelStorageTest() {
             .withCredentials(EnvironmentVariableCredentialsProvider())
             .build()
 
-        storageRepository = AWSStorageRepository(s3Client)
+        val notificationService = TODO()
+
+        storageRepository = AWSStorageRepository(s3Client, notificationService)
         (storageRepository as AWSStorageRepository).create("already-existing-channel")
         storageRepository!!.delete("channel-name")
         userRepository = IamUserRepository()

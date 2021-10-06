@@ -37,7 +37,7 @@ abstract class StorageRepositoryTest {
     }
 }
 
-class AWSStorageRepositoryTest : StorageRepositoryTest() {
+class AWSStorageRepositoryContractTest : StorageRepositoryTest() {
     @BeforeEach
     fun setUp() {
         val s3Client = AmazonS3ClientBuilder
@@ -46,13 +46,15 @@ class AWSStorageRepositoryTest : StorageRepositoryTest() {
             .withCredentials(EnvironmentVariableCredentialsProvider())
             .build()
 
-        storageRepository = AWSStorageRepository(s3Client)
+        storageRepository = AWSStorageRepository(s3Client, TODO())
         newBucketName = "test-test-testing"
         storageRepository!!.delete(newBucketName!!)
     }
+
+
 }
 
-class FakeStorageRepositoryTest : StorageRepositoryTest() {
+class FakeStorageRepositoryContractTest : StorageRepositoryTest() {
     @BeforeEach
     fun setUp() {
         storageRepository = FakeStorageRepository()
