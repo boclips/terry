@@ -34,9 +34,11 @@ dependencies {
 	implementation(platform("com.amazonaws:aws-java-sdk-bom:1.11.1000"))
 	implementation("com.amazonaws:aws-java-sdk-s3")
 	implementation("com.amazonaws:aws-java-sdk-iam")
+	implementation("org.springframework.boot:spring-boot-starter-validation")
 
 	testImplementation("io.kotlintest:kotlintest-runner-junit5:3.3.0")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
 }
 
 tasks.withType<KotlinCompile> {
