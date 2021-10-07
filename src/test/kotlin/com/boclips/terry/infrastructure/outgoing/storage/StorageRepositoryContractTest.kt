@@ -47,7 +47,7 @@ class AWSStorageRepositoryContractTest : StorageRepositoryTest() {
             .withCredentials(EnvironmentVariableCredentialsProvider())
             .build()
 
-        storageRepository = AWSStorageRepository(s3Client, AWSNotificationService(s3Client, AWSNotificationProperties().apply { this.channelTopicArn = "fake" }))
+        storageRepository = AWSStorageRepository(s3Client, AWSNotificationService(s3Client, AWSNotificationProperties().apply { this.channelTopicArn = "arn:aws:sns:eu-west-1:547547041387:test-topic" }))
         newBucketName = "test-test-testing"
         storageRepository!!.delete(newBucketName!!)
     }

@@ -12,15 +12,13 @@ class AWSNotificationService(
     private val awsNotificationProperties: AWSNotificationProperties
 ) : NotificationService {
     override fun addBucketNotification(bucketName: String) {
-        val notificationConfiguration = BucketNotificationConfiguration().apply {
-            this.addConfiguration(
+        val notificationConfiguration = BucketNotificationConfiguration().addConfiguration(
                 "snsTopicConfig",
                 TopicConfiguration(
                     awsNotificationProperties.channelTopicArn,
                     EnumSet.of(S3Event.ObjectCreated)
                 )
             )
-        }
 
         s3Client.setBucketNotificationConfiguration(bucketName, notificationConfiguration)
     }

@@ -53,7 +53,7 @@ class CreateAWSStorageTest : CreateChannelStorageTest() {
             .withCredentials(EnvironmentVariableCredentialsProvider())
             .build()
 
-        val notificationService = AWSNotificationService(s3Client, AWSNotificationProperties().apply { this.channelTopicArn = "fake-arn" })
+        val notificationService = AWSNotificationService(s3Client, AWSNotificationProperties().apply { this.channelTopicArn = "arn:aws:sns:eu-west-1:547547041387:test-topic" })
 
         storageRepository = AWSStorageRepository(s3Client, notificationService)
         (storageRepository as AWSStorageRepository).create("already-existing-channel")

@@ -3,4 +3,4 @@ slack:
   signingSecret: fake-secret
 
 aws-notifications:
-  channelTopicArn: fake-arn
+  channelTopicArn: arn:aws:sns:eu-west-1:547547041387:test-topic
