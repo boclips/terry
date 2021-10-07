@@ -6,6 +6,7 @@ import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import com.boclips.terry.infrastructure.outgoing.policy.IamPolicyRepository
 import com.boclips.terry.infrastructure.outgoing.policy.PolicyRepository
+import com.boclips.terry.infrastructure.outgoing.storage.AWSNotificationService
 import com.boclips.terry.infrastructure.outgoing.storage.AWSStorageRepository
 import com.boclips.terry.infrastructure.outgoing.storage.NotificationService
 import com.boclips.terry.infrastructure.outgoing.storage.StorageRepository
@@ -17,7 +18,9 @@ import org.springframework.context.annotation.Profile
 
 @Profile("!test")
 @Configuration
-class AWSConfig {
+class AWSConfig(
+    private val awsNotificationProperties: AWSNotificationProperties
+) {
     @Bean
     fun s3Client(): AmazonS3 = AmazonS3ClientBuilder
         .standard()
@@ -36,5 +39,5 @@ class AWSConfig {
     fun userRepository(): UserRepository = IamUserRepository()
 
     @Bean
-    fun notificationService(): NotificationService = TODO()
+    fun notificationService(s3Client: AmazonS3): NotificationService = AWSNotificationService(s3Client, awsNotificationProperties)
 }

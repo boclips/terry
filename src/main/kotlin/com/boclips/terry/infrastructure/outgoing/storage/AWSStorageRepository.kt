@@ -21,12 +21,9 @@ class AWSStorageRepository(
                 StorageCreationFailure(e.message ?: "Storage creation failed!")
             }
         }
-        // s3.setBucketNotificationConfiguration(
-        //     SetBucketNotificationConfigurationRequest(
-        //         bucketName,
-        //         BucketNotificationConfiguration().addConfiguration("Notify", NotificationConfiguration().addEvent(S3Event.ObjectCreated))
-        //     )
-        // )
+
+        notificationService.addBucketNotification(bucketName)
+
         return StorageCreationSuccess(bucketName)
     }
 

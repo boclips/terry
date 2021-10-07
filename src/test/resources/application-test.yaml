@@ -1,3 +1,6 @@
 slack:
   botToken: fake-token
   signingSecret: fake-secret
+
+aws-notifications:
+  channelTopicArn: fake-arn

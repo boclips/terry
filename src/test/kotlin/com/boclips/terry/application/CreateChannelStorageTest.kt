@@ -3,9 +3,11 @@ package com.boclips.terry.application
 import com.amazonaws.auth.EnvironmentVariableCredentialsProvider
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
+import com.boclips.terry.config.AWSNotificationProperties
 import com.boclips.terry.infrastructure.outgoing.policy.FakePolicyRepository
 import com.boclips.terry.infrastructure.outgoing.policy.IamPolicyRepository
 import com.boclips.terry.infrastructure.outgoing.policy.PolicyRepository
+import com.boclips.terry.infrastructure.outgoing.storage.AWSNotificationService
 import com.boclips.terry.infrastructure.outgoing.storage.AWSStorageRepository
 import com.boclips.terry.infrastructure.outgoing.storage.FakeStorageRepository
 import com.boclips.terry.infrastructure.outgoing.storage.StorageRepository
@@ -51,7 +53,7 @@ class CreateAWSStorageTest : CreateChannelStorageTest() {
             .withCredentials(EnvironmentVariableCredentialsProvider())
             .build()
 
-        val notificationService = TODO()
+        val notificationService = AWSNotificationService(s3Client, AWSNotificationProperties().apply { this.channelTopicArn = "fake-arn" })
 
         storageRepository = AWSStorageRepository(s3Client, notificationService)
         (storageRepository as AWSStorageRepository).create("already-existing-channel")

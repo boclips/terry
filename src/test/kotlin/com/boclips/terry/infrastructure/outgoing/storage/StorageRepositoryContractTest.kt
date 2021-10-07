@@ -3,6 +3,7 @@ package com.boclips.terry.infrastructure.outgoing.storage
 import com.amazonaws.auth.EnvironmentVariableCredentialsProvider
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
+import com.boclips.terry.config.AWSNotificationProperties
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -46,7 +47,7 @@ class AWSStorageRepositoryContractTest : StorageRepositoryTest() {
             .withCredentials(EnvironmentVariableCredentialsProvider())
             .build()
 
-        storageRepository = AWSStorageRepository(s3Client, TODO())
+        storageRepository = AWSStorageRepository(s3Client, AWSNotificationService(s3Client, AWSNotificationProperties().apply { this.channelTopicArn = "fake" }))
         newBucketName = "test-test-testing"
         storageRepository!!.delete(newBucketName!!)
     }
