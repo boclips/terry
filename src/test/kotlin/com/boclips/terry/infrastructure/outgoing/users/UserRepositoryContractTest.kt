@@ -1,12 +1,15 @@
 package com.boclips.terry.infrastructure.outgoing.users
 
+import com.boclips.terry.infrastructure.outgoing.policy.FakePolicyRepository
 import com.boclips.terry.infrastructure.outgoing.policy.IamPolicyRepository
+import com.boclips.terry.infrastructure.outgoing.policy.PolicyRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 abstract class UserRepositoryTest {
     var userRepository: UserRepository? = null
+    var policyRepository: PolicyRepository? = null
     var policyId: String? = null
 
     @Test
@@ -21,8 +24,7 @@ abstract class UserRepositoryTest {
     fun `adds a policy to user`() {
         userRepository!!.create("my-test-user")
 
-        TODO("this should use the fake policy")
-        policyId = IamPolicyRepository().createOrGet("my-test-policy")
+        policyId = policyRepository!!.createOrGet("my-test-policy")
         val addPolicyToUserResult = userRepository!!.addPolicyToUser("my-test-user", policyId!!)
 
         assertThat(addPolicyToUserResult).isTrue
@@ -30,7 +32,7 @@ abstract class UserRepositoryTest {
         val removePolicyFromUserResult =
             userRepository!!.removePolicyFromUser(policyId = policyId!!, userName = "my-test-user")
         assertThat(removePolicyFromUserResult).isTrue
-        IamPolicyRepository().delete(policyId = policyId!!)
+        policyRepository!!.delete(policyId = policyId!!)
     }
 }
 
@@ -38,6 +40,7 @@ class IamUserRepositoryTest : UserRepositoryTest() {
     @BeforeEach
     internal fun setUp() {
         userRepository = IamUserRepository()
+        policyRepository = IamPolicyRepository()
     }
 }
 
@@ -45,5 +48,6 @@ class FakeUserRepositoryTest : UserRepositoryTest() {
     @BeforeEach
     internal fun setUp() {
         userRepository = FakeUserRepository()
+        policyRepository = FakePolicyRepository()
     }
 }
