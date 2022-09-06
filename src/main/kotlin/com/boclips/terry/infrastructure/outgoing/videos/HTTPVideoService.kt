@@ -35,7 +35,7 @@ class HTTPVideoService(private val videosClient: VideosClient) : VideoService {
             if (ex.status() == 404) {
                 MissingVideo(videoId)
             } else {
-                Error("Something went wrong fetching video with id $videoId")
+                Error("Something went wrong fetching video with id $videoId - ${ex.message}")
             }
         } catch (ex: HttpServerErrorException) {
             Error(message = "Server bad: $ex")

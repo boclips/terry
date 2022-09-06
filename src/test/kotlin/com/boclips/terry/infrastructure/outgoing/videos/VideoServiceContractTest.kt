@@ -1,6 +1,7 @@
 package com.boclips.terry.infrastructure.outgoing.videos
 
 import com.boclips.videos.api.httpclient.VideosClient
+import com.fasterxml.jackson.databind.ObjectMapper
 import feign.okhttp.OkHttpClient
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -62,19 +63,14 @@ abstract class VideoServiceTests {
 
     @Test
     fun `retrieves a Kaltura video that exists`() {
-        val foundVideo = videoServiceForKaltura!!.get("2584078") as FoundKalturaVideo
-        assertThat(foundVideo.videoId)
-            .isEqualTo("5c54d8cad8eafeecae2179af")
-        assertThat(foundVideo.title)
-            .isEqualTo("Tesco opens new discount supermarket 'Jack's'")
-        assertThat(foundVideo.description)
-            .isEqualTo(expectedKalturaDescription)
-        assertThat(foundVideo.thumbnailUrl)
-            .isEqualTo(expectedKalturaThumbnailUrl)
+        val foundVideo = videoServiceForKaltura!!.get("5c54d8cad8eafeecae2179af") as FoundKalturaVideo
+        assertThat(foundVideo.videoId).isEqualTo("5c54d8cad8eafeecae2179af")
+        assertThat(foundVideo.title).isEqualTo("Tesco opens new discount supermarket 'Jack's'")
+        assertThat(foundVideo.description).isEqualTo(expectedKalturaDescription)
+        assertThat(foundVideo.thumbnailUrl).isEqualTo(expectedKalturaThumbnailUrl)
         assertThat(foundVideo.streamUrl)
             .startsWith("https://cdnapisec.kaltura.com/p/1776261/sp/177626100/playManifest/entryId/1_y0g6ftvy/format/applehttp")
-        assertThat(foundVideo.playbackId)
-            .isEqualTo("1_y0g6ftvy")
+        assertThat(foundVideo.playbackId).isEqualTo("1_y0g6ftvy")
     }
 
     @Test
