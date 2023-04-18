@@ -225,7 +225,7 @@ class Terry {
                     ChatReply(
                         slackMessage = SlackMessage(
                             channel = event.channel,
-                            text = """<@${event.user}> looks like the video service is broken :("""
+                            text = """<@${event.user}> looks like the video service is broken :( \n ${videoServiceResponse.message}"""
                         )
                     )
             }

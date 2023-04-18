@@ -418,7 +418,7 @@ class TerryTests {
                         ChatReply(
                             slackMessage = SlackMessage(
                                 channel = "#engineering",
-                                text = """<@THAD123> looks like the video service is broken :("""
+                                text = """<@THAD123> looks like the video service is broken :( \n 500 REALLY BAD"""
                             )
                         )
                     )
