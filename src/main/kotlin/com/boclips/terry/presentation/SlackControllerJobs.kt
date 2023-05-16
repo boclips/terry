@@ -2,6 +2,7 @@ package com.boclips.terry.presentation
 
 import com.boclips.kalturaclient.KalturaClient
 import com.boclips.terry.application.*
+import com.boclips.terry.infrastructure.outgoing.ComposeSentryReport
 import com.boclips.terry.infrastructure.outgoing.securecredentials.SecureCredentialRetriever
 import com.boclips.terry.infrastructure.outgoing.slack.PostFailure
 import com.boclips.terry.infrastructure.outgoing.slack.PostSuccess
@@ -16,7 +17,8 @@ open class SlackControllerJobs(
     private val videoService: VideoService,
     private val kalturaClient: KalturaClient,
     private val retriever: SecureCredentialRetriever,
-    private val createChannelStorage: CreateChannelStorage
+    private val createChannelStorage: CreateChannelStorage,
+    private val composeSentryReport: ComposeSentryReport
 ) {
     @Async
     open fun getVideo(action: VideoRetrieval) {
@@ -48,6 +50,13 @@ open class SlackControllerJobs(
         action
             .onComplete(createChannelStorage(action.channelName))
             .apply { chat(slackMessage) }
+
+    @Async
+    open fun createSentryReport(action: SentryReportCreation) {
+        action
+            .onComplete( composeSentryReport(action.params) )
+            .apply { chat(slackMessage) }
+    }
 
     @Async
     open fun chat(slackMessage: SlackMessage, url: String = "https://slack.com/api/chat.postMessage"): Unit =

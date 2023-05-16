@@ -4,6 +4,7 @@ import com.boclips.kalturaclient.KalturaClient
 import com.boclips.terry.application.*
 import com.boclips.terry.infrastructure.incoming.Malformed
 import com.boclips.terry.infrastructure.incoming.SlackRequest
+import com.boclips.terry.infrastructure.outgoing.ComposeSentryReport
 import com.boclips.terry.infrastructure.outgoing.storage.StorageRepository
 import com.boclips.terry.infrastructure.outgoing.securecredentials.SecureCredentialRetriever
 import com.boclips.terry.infrastructure.outgoing.slack.SlackPoster
@@ -28,7 +29,8 @@ class SlackController(
     private val kalturaClient: KalturaClient,
     private val retriever: SecureCredentialRetriever,
     private val objectMapper: ObjectMapper,
-    private val createChannelStorage: CreateChannelStorage
+    private val createChannelStorage: CreateChannelStorage,
+    private val composeSentryReport: ComposeSentryReport
 ) {
     companion object : KLogging()
 
@@ -66,29 +68,14 @@ class SlackController(
                         logger.error { action.reason }
                         logger.error { action.request.body }
                     }
-            MalformedRequestRejection ->
-                badRequest()
-            is ChatReply ->
-                ok()
-                    .also { chat(action) }
-            is VideoRetrieval ->
-                ok()
-                    .also { getVideo(action) }
-            is VerificationResponse ->
-                ok(SlackVerificationResponse(action.challenge))
-            is VideoTagging ->
-                ok()
-                    .also { tagVideo(action) }
-            is ChannelUploadCredentialRetrieval ->
-                ok()
-                    .also {
-                        getCredential(action)
-                    }
-            is ChannelCreation ->
-                ok()
-                    .also {
-                        createChannelBucket(action)
-                    }
+            is MalformedRequestRejection -> badRequest()
+            is ChatReply -> ok().also { chat(action) }
+            is VideoRetrieval -> ok().also { getVideo(action) }
+            is VerificationResponse -> ok(SlackVerificationResponse(action.challenge))
+            is VideoTagging -> ok().also { tagVideo(action) }
+            is ChannelUploadCredentialRetrieval -> ok().also { getCredential(action) }
+            is ChannelCreation -> ok().also { createChannelBucket(action) }
+            is SentryReportCreation -> ok().also { createSentryReport(action) }
         }
     }
 
@@ -112,6 +99,10 @@ class SlackController(
             .createChannelBucket(action)
     }
 
+    private fun createSentryReport(action: SentryReportCreation) {
+        slackControllerJobs().createSentryReport(action)
+    }
+
     private fun chat(action: ChatReply) {
         slackControllerJobs()
             .chat(action.slackMessage)
@@ -122,7 +113,8 @@ class SlackController(
         videoService = videoService,
         kalturaClient = kalturaClient,
         retriever = retriever,
-        createChannelStorage = createChannelStorage
+        createChannelStorage = createChannelStorage,
+        composeSentryReport = composeSentryReport
     )
 
     private fun ok(obj: ControllerResponse = Success) =

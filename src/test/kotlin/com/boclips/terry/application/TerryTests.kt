@@ -166,6 +166,13 @@ class TerryTests {
     }
 
     @Test
+    fun `produces sentry report`() {
+        val decision = mentionTerry("Gimme sentry report", channel = "#engineering")
+        assertThat(decision.log).isEqualTo("Generating sentry report")
+        assertThat(decision.action).isInstanceOf(SentryReportCreation::class.java)
+    }
+
+    @Test
     fun `can retrieve credentials for a channel`() {
         val decision = mentionTerry(
             "SAfeNote for mythology-and-fiction_explained please bud?",

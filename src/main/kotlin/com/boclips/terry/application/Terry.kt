@@ -1,6 +1,12 @@
 package com.boclips.terry.application
 
-import com.boclips.terry.infrastructure.incoming.*
+import com.boclips.terry.infrastructure.incoming.AppMention
+import com.boclips.terry.infrastructure.incoming.BlockActions
+import com.boclips.terry.infrastructure.incoming.EventNotification
+import com.boclips.terry.infrastructure.incoming.Malformed
+import com.boclips.terry.infrastructure.incoming.SlackEvent
+import com.boclips.terry.infrastructure.incoming.SlackRequest
+import com.boclips.terry.infrastructure.incoming.VerificationRequest
 import com.boclips.terry.infrastructure.outgoing.securecredentials.CredentialNotFound
 import com.boclips.terry.infrastructure.outgoing.securecredentials.SafenoteFailure
 import com.boclips.terry.infrastructure.outgoing.securecredentials.SecureCredential
@@ -11,7 +17,11 @@ import com.boclips.terry.infrastructure.outgoing.slack.SlackMessageVideo.SlackMe
 import com.boclips.terry.infrastructure.outgoing.slack.TranscriptCodeForEntryId
 import com.boclips.terry.infrastructure.outgoing.transcripts.Failure
 import com.boclips.terry.infrastructure.outgoing.transcripts.Success
-import com.boclips.terry.infrastructure.outgoing.videos.*
+import com.boclips.terry.infrastructure.outgoing.videos.Error
+import com.boclips.terry.infrastructure.outgoing.videos.FoundKalturaVideo
+import com.boclips.terry.infrastructure.outgoing.videos.FoundVideo
+import com.boclips.terry.infrastructure.outgoing.videos.FoundYouTubeVideo
+import com.boclips.terry.infrastructure.outgoing.videos.MissingVideo
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.stereotype.Component
 
@@ -50,10 +60,13 @@ class Terry {
                     log = "Responding to verification challenge",
                     action = VerificationResponse(challenge = request.challenge)
                 )
+
             is EventNotification ->
                 handleEventNotification(request.event)
+
             is BlockActions ->
                 handleTranscriptRequest(blockActionsToTranscriptRequest(request))
+
             Malformed ->
                 Decision(
                     log = "Malformed request",
@@ -83,6 +96,7 @@ class Terry {
                                     text = """<@${request.user}> OK, I requested a transcript for "${response.entryId}" (${transcriptCode.displayName})."""
                                 )
                             )
+
                         is Failure ->
                             ChatReply(
                                 slackMessage = SlackMessage(
@@ -109,8 +123,8 @@ class Terry {
                 )
             }
 
-    private fun handleEventNotification(event: SlackEvent): Decision =
-        when (event) {
+    private fun handleEventNotification(event: SlackEvent): Decision {
+        return when (event) {
             is AppMention -> {
                 extractVideoId(event.text)?.let { videoId ->
                     videoRetrieval(videoId, event)
@@ -118,9 +132,30 @@ class Terry {
                     channelUploadCredentialRetrieval(channelName, event)
                 } ?: extractChannelCreationChannelName(event.text)?.let { channelName ->
                     channelCreation(channelName, event)
+                } ?: extractSentryReportParams(event.text)?.let { reportParams ->
+                    createSentryReport(reportParams, event)
                 } ?: help(event)
             }
         }
+    }
+
+    private fun createSentryReport(params: SentryReportParams, event: AppMention): Decision {
+        return Decision(
+            log = "Generating sentry report",
+            action = SentryReportCreation(params) { response ->
+                ChatReply(
+                    slackMessage = SlackMessage(
+                        channel = event.channel,
+                        text = "Sure <@${event.user}>, sizzling sentry report for you! ${response.report}"
+                    )
+                )
+            }
+        )
+    }
+
+    private fun extractSentryReportParams(text: String): SentryReportParams? {
+        return SentryReportParams.takeIf { text.lowercase().contains("sentry report") }
+    }
 
     private fun extractChannelCreationChannelName(text: String): String? =
         extractChannelName(text, """.*(?:bucket|channel)(?: for)? ([a-z0-9-_ ]+).*""")
@@ -177,12 +212,14 @@ class Terry {
                         channel = event.channel
                     )
                 )
+
                 CredentialNotFound -> ChatReply(
                     slackMessage = SlackMessage(
                         text = """Sorry <@${event.user}>, I can't find "$channelName" - maybe check the name?""",
                         channel = event.channel
                     )
                 )
+
                 is SafenoteFailure -> ChatReply(
                     slackMessage = SlackMessage(
                         text = "Sorry <@${event.user}>, the Safenote service isn't working! Ask an engineer? (${response.message})",
@@ -207,6 +244,7 @@ class Terry {
                         event = event,
                         requestVideoId = videoId
                     )
+
                 is FoundYouTubeVideo ->
                     replyWithVideo(
                         foundVideo = videoServiceResponse,
@@ -214,6 +252,7 @@ class Terry {
                         event = event,
                         requestVideoId = videoId
                     )
+
                 is MissingVideo ->
                     ChatReply(
                         slackMessage = SlackMessage(
@@ -221,6 +260,7 @@ class Terry {
                             text = """<@${event.user}> Sorry, video $videoId doesn't seem to exist! :("""
                         )
                     )
+
                 is Error ->
                     ChatReply(
                         slackMessage = SlackMessage(

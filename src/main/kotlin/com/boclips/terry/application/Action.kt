@@ -37,3 +37,8 @@ data class ChannelCreation(
     val channelName: String,
     val onComplete: (ChannelCreationResponse) -> ChatReply
 ): Action()
+
+data class SentryReportCreation(
+    val params: SentryReportParams,
+    val onComplete: (SentryReportResponse) -> ChatReply
+) : Action()

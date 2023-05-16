@@ -358,6 +358,49 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
         )
     }
 
+    @Test
+    fun `responds to sentry report request`() {
+        slackPoster.respondWith(PostSuccess(timestamp = BigDecimal(1231231)))
+
+        postFromSlack(
+            body = """
+            {
+                "token": "ZZZZZZWSxiZZZ2yIvs3peJ",
+                "team_id": "T061EG9R6",
+                "api_app_id": "A0MDYCDME",
+                "event": {
+                    "funny_unknown_property": "to-test-ignoring-unknown-properties",
+                    "type": "app_mention",
+                    "user": "U061F7AUR",
+                    "text": "Hey <@U0LAN0Z89>, could you please serve me a cool beer and sentry report?",
+                    "ts": "1515449438.000011",
+                    "channel": "C0LAN2Q65",
+                    "event_ts": "1515449438000011"
+                },
+                "type": "event_callback",
+                "event_id": "Ev0MDYGDKJ",
+                "event_time": 1515449438000011,
+                "authed_users": [
+                    "U0LAN0Z89"
+                ]
+            }
+            """.trimIndent(),
+            path = "/slack"
+        )
+            .andExpect(status().isOk)
+            .andExpect(content().json("{}"))
+
+        assertThat(slackPoster.slackMessages)
+            .isEqualTo(
+                listOf(
+                    SlackMessage(
+                        text = "Sure <@U061F7AUR>, sizzling sentry report for you! <REPORT>",
+                        channel = "C0LAN2Q65"
+                    )
+                )
+            )
+    }
+
     private fun transcriptRequestBody(
         entryId: String,
         channel: String,
