@@ -1,6 +1,18 @@
 package com.boclips.terry.application
 
-import com.boclips.terry.infrastructure.incoming.*
+import com.boclips.terry.application.decisions.EventNotificationDecisionMaker
+import com.boclips.terry.application.decisions.DunnoWhatToDo
+import com.boclips.terry.application.decisions.GimmeBucketForChannel
+import com.boclips.terry.application.decisions.GimmeSafenoteForChannel
+import com.boclips.terry.application.decisions.GimmeSentryReport
+import com.boclips.terry.application.decisions.GimmeVideo
+import com.boclips.terry.infrastructure.incoming.SlackEvent
+import com.boclips.terry.infrastructure.incoming.BlockAction
+import com.boclips.terry.infrastructure.incoming.BlockActionIdentifiable
+import com.boclips.terry.infrastructure.incoming.BlockActionSelectedOption
+import com.boclips.terry.infrastructure.incoming.BlockActions
+import com.boclips.terry.infrastructure.incoming.EventNotification
+import com.boclips.terry.infrastructure.incoming.VerificationRequest
 import com.boclips.terry.infrastructure.outgoing.securecredentials.CredentialNotFound
 import com.boclips.terry.infrastructure.outgoing.securecredentials.SafenoteFailure
 import com.boclips.terry.infrastructure.outgoing.securecredentials.SecureCredential
@@ -17,16 +29,34 @@ import com.boclips.terry.infrastructure.outgoing.videos.MissingVideo
 import io.kotlintest.properties.assertAll
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.fail
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.*
+import java.util.Date
 
 class TerryTests {
     private val irrelevant: String = "irrelevant"
 
+    lateinit var terry: Terry
+
+    @BeforeEach
+    fun setUp() {
+        terry = Terry(
+            EventNotificationDecisionMaker(
+                possibleThingsToDo = listOf(
+                    GimmeBucketForChannel(),
+                    GimmeSafenoteForChannel(),
+                    GimmeSentryReport(),
+                    GimmeVideo()
+                ),
+                dunnoWhatToDo = DunnoWhatToDo()
+            )
+        )
+    }
+
     @Test
     fun `verifies Slack`() {
         assertThat(
-            Terry().receiveSlack(
+            terry.receiveSlack(
                 request = VerificationRequest(
                     challenge = "bet-you-cant-copy-paste-this-m8",
                     type = irrelevant
@@ -437,7 +467,7 @@ class TerryTests {
     @Test
     fun `transcript request translates the code into Kaltura language`() {
         assertThat(
-            (Terry().receiveSlack(
+            (terry.receiveSlack(
                 BlockActions(
                     actions = listOf(
                         BlockAction(
@@ -455,7 +485,7 @@ class TerryTests {
     @Test
     fun `transcript request with unknown code gives a malformed rejection`() {
         assertThat(
-            Terry().receiveSlack(
+            terry.receiveSlack(
                 BlockActions(
                     actions = listOf(
                         BlockAction(
@@ -472,7 +502,7 @@ class TerryTests {
 
     @Test
     fun `successful transcript request triggers a chat message with the entry ID of the video`() {
-        when (val action = Terry().receiveSlack(
+        when (val action = terry.receiveSlack(
             BlockActions(
                 actions = listOf(
                     BlockAction(
@@ -494,6 +524,7 @@ class TerryTests {
                             )
                         )
                     )
+
             else ->
                 fail<String>("Expected a transcript request, but got $action")
         }
@@ -501,7 +532,7 @@ class TerryTests {
 
     @Test
     fun `failed transcript request triggers a chat message`() {
-        when (val action = Terry().receiveSlack(
+        when (val action = terry.receiveSlack(
             BlockActions(
                 actions = listOf(
                     BlockAction(
@@ -529,11 +560,11 @@ class TerryTests {
     }
 
     private fun mentionTerry(message: String, user: String = "DEFAULTUSERID", channel: String): Decision =
-        Terry().receiveSlack(
+        terry.receiveSlack(
             EventNotification(
                 teamId = irrelevant,
                 apiAppId = irrelevant,
-                event = AppMention(
+                event = SlackEvent(
                     type = irrelevant,
                     channel = channel,
                     text = "<@TERRYID> $message",
