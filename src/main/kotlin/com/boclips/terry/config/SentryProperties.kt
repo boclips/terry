@@ -5,6 +5,6 @@ import org.springframework.stereotype.Component
 
 @Component
 @ConfigurationProperties("sentry")
-data class SentryProperties(
-    val token: String? = null
+class SentryProperties(
+    var token: String? = null
 )
