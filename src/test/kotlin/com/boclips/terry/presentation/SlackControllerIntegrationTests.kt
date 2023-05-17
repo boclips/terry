@@ -23,8 +23,14 @@ import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.ResultActions
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.header
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath
 import testsupport.AbstractSpringIntegrationTest
+import testsupport.SentryProjectFactory
+import testsupport.SentryProjectIssueFactory
 import java.math.BigDecimal
 
 // This is a rotated secret, used because we hard-code an example signed by Slack with this secret
@@ -362,6 +368,33 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
     fun `responds to sentry report request`() {
         slackPoster.respondWith(PostSuccess(timestamp = BigDecimal(1231231)))
 
+        val project1 = SentryProjectFactory.sample("1", "service-1")
+        val project2 = SentryProjectFactory.sample("2", "service-2")
+
+        sentryClient.addProjectWithIssues(
+            project = project1,
+            listOf(
+                SentryProjectIssueFactory.sample(
+                    project = project1,
+                    count = 4,
+                    type = "NPE",
+                    title = "This is NPE"
+                )
+            )
+        )
+
+        sentryClient.addProjectWithIssues(
+            project = project2,
+            listOf(
+                SentryProjectIssueFactory.sample(
+                    project = project2,
+                    count = 5,
+                    type = "IAE",
+                    title = "This is IAE"
+                )
+            )
+        )
+
         postFromSlack(
             body = """
             {
@@ -394,7 +427,9 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
             .isEqualTo(
                 listOf(
                     SlackMessage(
-                        text = "Sure <@U061F7AUR>, sizzling sentry report for you! <REPORT>",
+                        text = "Sure <@U061F7AUR>, sizzling sentry report for you!\n" +
+                            "service-2 - 5 - IAE - This is IAE\n" +
+                            "service-1 - 4 - NPE - This is NPE",
                         channel = "C0LAN2Q65"
                     )
                 )

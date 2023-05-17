@@ -4,8 +4,7 @@ import com.boclips.kalturaclient.KalturaClient
 import com.boclips.terry.application.*
 import com.boclips.terry.infrastructure.incoming.Malformed
 import com.boclips.terry.infrastructure.incoming.SlackRequest
-import com.boclips.terry.infrastructure.outgoing.ComposeSentryReport
-import com.boclips.terry.infrastructure.outgoing.storage.StorageRepository
+import com.boclips.terry.infrastructure.outgoing.sentry.ComposeSentryReport
 import com.boclips.terry.infrastructure.outgoing.securecredentials.SecureCredentialRetriever
 import com.boclips.terry.infrastructure.outgoing.slack.SlackPoster
 import com.boclips.terry.infrastructure.outgoing.videos.VideoService

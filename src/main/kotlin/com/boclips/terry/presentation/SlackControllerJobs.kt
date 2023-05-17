@@ -1,8 +1,13 @@
 package com.boclips.terry.presentation
 
 import com.boclips.kalturaclient.KalturaClient
-import com.boclips.terry.application.*
-import com.boclips.terry.infrastructure.outgoing.ComposeSentryReport
+import com.boclips.terry.application.ChannelCreation
+import com.boclips.terry.application.ChannelUploadCredentialRetrieval
+import com.boclips.terry.application.CreateChannelStorage
+import com.boclips.terry.application.SentryReportCreation
+import com.boclips.terry.application.VideoRetrieval
+import com.boclips.terry.application.VideoTagging
+import com.boclips.terry.infrastructure.outgoing.sentry.ComposeSentryReport
 import com.boclips.terry.infrastructure.outgoing.securecredentials.SecureCredentialRetriever
 import com.boclips.terry.infrastructure.outgoing.slack.PostFailure
 import com.boclips.terry.infrastructure.outgoing.slack.PostSuccess
@@ -54,7 +59,7 @@ open class SlackControllerJobs(
     @Async
     open fun createSentryReport(action: SentryReportCreation) {
         action
-            .onComplete( composeSentryReport(action.params) )
+            .onComplete(composeSentryReport(action.params))
             .apply { chat(slackMessage) }
     }
 
@@ -63,6 +68,7 @@ open class SlackControllerJobs(
         when (val response = slackPoster.chatPostMessage(slackMessage, url = url)) {
             is PostSuccess ->
                 SlackController.logger.debug { "Successful post of $slackMessage" }
+
             is PostFailure ->
                 SlackController.logger.error { "Failed post to Slack: ${response.message}" }
         }

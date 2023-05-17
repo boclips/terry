@@ -9,7 +9,7 @@ import com.boclips.terry.infrastructure.outgoing.slack.SlackMessage
 import org.springframework.stereotype.Component
 
 @Component
-class GimmeSentryReport: WhatToDo {
+class GimmeSentryReport : WhatToDo {
     override fun isMe(event: SlackEvent): Boolean {
         return extractSentryReportParams(event) != null
     }
@@ -22,7 +22,7 @@ class GimmeSentryReport: WhatToDo {
                 ChatReply(
                     slackMessage = SlackMessage(
                         channel = event.channel,
-                        text = "Sure <@${event.user}>, sizzling sentry report for you! ${response.report}"
+                        text = "Sure <@${event.user}>, sizzling sentry report for you!\n${response.report}"
                     )
                 )
             }
@@ -30,6 +30,6 @@ class GimmeSentryReport: WhatToDo {
     }
 
     private fun extractSentryReportParams(event: SlackEvent): SentryReportParams? {
-        return SentryReportParams.takeIf { event.text.lowercase().contains("sentry report") }
+        return SentryReportParams().takeIf { event.text.lowercase().contains("sentry report") }
     }
 }
