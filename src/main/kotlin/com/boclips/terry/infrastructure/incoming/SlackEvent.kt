@@ -13,17 +13,24 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 )
 @JsonSubTypes(
     JsonSubTypes.Type(
-        value = SlackEvent::class,
+        value = AppMention::class,
         name = "app_mention"
     )
 )
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class SlackEvent(
+sealed class SlackEvent
+
+data class AppMention(
     val type: String,
+
     val user: String,
+
     val text: String,
+
     val ts: String,
+
     val channel: String,
+
     @JsonProperty("event_ts")
     val eventTs: String
-)
+) : SlackEvent()
