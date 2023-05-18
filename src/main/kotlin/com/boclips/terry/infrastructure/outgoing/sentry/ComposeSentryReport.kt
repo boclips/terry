@@ -36,10 +36,18 @@ class ComposeSentryReport(private val sentryClient: SentryClient) {
         return SentryReportResponse(report)
     }
 
-    private fun issueReport(issue: SentryProjectIssue): String =
-        """
-        |👉 *[${issue.count}x] [${issue.project!!.slug}] - ${issue.metadata!!.type}* (<${issue.permalink}|details>)
+    private fun issueReport(issue: SentryProjectIssue): String {
+        if (issue.metadata!!.value!!.trim().length > 2) {
+            return """
+        |👉 *[${issue.count}x] [${issue.project!!.slug}] - ${issue.metadata.type}* (<${issue.permalink}|details>)
         |       • _${issue.metadata.value}_
-        |       • `${issue.culprit}`
+        |       • _${issue.culprit}_
         """.trimMargin()
+        } else {
+            return """
+        |👉 *[${issue.count}x] [${issue.project!!.slug}] - ${issue.metadata.type}* (<${issue.permalink}|details>)
+        |       • _${issue.culprit}_
+        """.trimMargin()
+        }
+    }
 }

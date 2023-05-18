@@ -435,12 +435,12 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
                         |
                         |👉 *[5x] [service-2] - IAE* (<https://boclips.sentry.com|details>)
                         |       • _This is IAE_
-                        |       • `GET /v1/users`
+                        |       • _GET /v1/users_
                         |
                         |
                         |👉 *[4x] [service-1] - NPE* (<https://boclips.sentry.com|details>)
                         |       • _This is NPE_
-                        |       • `GET /v1/users`
+                        |       • _GET /v1/users_
                         """.trimMargin(),
                         channel = "C0LAN2Q65"
                     )
