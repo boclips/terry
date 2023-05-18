@@ -427,9 +427,19 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
             .isEqualTo(
                 listOf(
                     SlackMessage(
-                        text = "Sure <@U061F7AUR>, sizzling sentry report for you!\n" +
-                            "service-2 - 5 - IAE - This is IAE\n" +
-                            "service-1 - 4 - NPE - This is NPE",
+                        text =
+                        """
+                        |🚨 Sizzling Sentry report - [last 1d / engineering / production] 🚨 
+                        |Top 5 unresolved issues: 
+                        |👉 *[5x] [service-2] - IAE*
+                        |   - _This is IAE_
+                        |   - GET /v1/users
+                        |   - <https://boclips.sentry.com|open in Sentry>
+                        |👉 *[4x] [service-1] - NPE*
+                        |   - _This is NPE_
+                        |   - GET /v1/users
+                        |   - <https://boclips.sentry.com|open in Sentry>
+                        """.trimMargin(),
                         channel = "C0LAN2Q65"
                     )
                 )

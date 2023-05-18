@@ -22,7 +22,12 @@ class GimmeSentryReport : WhatToDo {
                 ChatReply(
                     slackMessage = SlackMessage(
                         channel = event.channel,
-                        text = "Sure <@${event.user}>, sizzling sentry report for you!\n${response.report}"
+                        text =
+                        """
+                        |🚨 Sizzling Sentry report - [last ${params.periodDays} / ${params.team} / ${params.environment}] 🚨 
+                        |Top ${params.issuesCount} unresolved issues: 
+                        |${response.report}
+                        """.trimMargin()
                     )
                 )
             }

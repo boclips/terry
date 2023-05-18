@@ -13,7 +13,6 @@ import java.util.concurrent.TimeUnit.MILLISECONDS
 
 @Component
 class ComposeSentryReport(private val sentryClient: SentryClient) {
-
     companion object : KLogging()
 
     operator fun invoke(params: SentryReportParams): SentryReportResponse {
@@ -28,11 +27,20 @@ class ComposeSentryReport(private val sentryClient: SentryClient) {
                 .flatten()
                 .sortedByDescending { it.count }
                 .take(params.issuesCount)
-                .joinToString(separator = System.lineSeparator()) { "${it.project!!.slug} - ${it.count} - ${it.metadata!!.type} - ${it.metadata.value}" }
+                .map { issueReport(it) }
+                .joinToString(separator = System.lineSeparator())
         }
 
         logger.info { "sentry report created in ${time.elapsed(MILLISECONDS)}ms" }
 
         return SentryReportResponse(report)
     }
+
+    private fun issueReport(issue: SentryProjectIssue): String =
+        """
+        |👉 *[${issue.count}x] [${issue.project!!.slug}] - ${issue.metadata!!.type}*
+        |   - _${issue.metadata.value}_
+        |   - ${issue.culprit}
+        |   - <${issue.permalink}|open in Sentry>
+        """.trimMargin()
 }
