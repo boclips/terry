@@ -28,7 +28,7 @@ class ComposeSentryReport(private val sentryClient: SentryClient) {
                 .sortedByDescending { it.count }
                 .take(params.issuesCount)
                 .map { issueReport(it) }
-                .joinToString(separator = System.lineSeparator().repeat(2))
+                .joinToString(separator = System.lineSeparator().repeat(3))
         }
 
         logger.info { "sentry report created in ${time.elapsed(MILLISECONDS)}ms" }

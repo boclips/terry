@@ -57,6 +57,6 @@ class HttpSentryClient(private val sentryProperties: SentryProperties) : SentryC
     }
 
     private fun projectIssuesUrl(project: SentryProject, params: SentryReportParams): String {
-        return "https://boclips.sentry.io/api/0/organizations/boclips/issues/?environment=${params.environment}&project=${project.id}&query=&sort=freq&statsPeriod=${params.periodDays}&limit=${params.issuesCount}&query=is:unresolved"
+        return "https://boclips.sentry.io/api/0/organizations/boclips/issues/?environment=${params.environment}&project=${project.id}&query=&sort=freq&statsPeriod=${params.period}&limit=${params.issuesCount}&query=is:unresolved"
     }
 }

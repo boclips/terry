@@ -437,6 +437,7 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
                         |       • _This is IAE_
                         |       • `GET /v1/users`
                         |
+                        |
                         |👉 *[4x] [service-1] - NPE* (<https://boclips.sentry.com|details>)
                         |       • _This is NPE_
                         |       • `GET /v1/users`

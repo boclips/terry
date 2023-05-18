@@ -24,7 +24,7 @@ class GimmeSentryReport : WhatToDo {
                         channel = event.channel,
                         text =
                         """
-                        |🚨 *Sizzling Sentry report - [last ${params.periodDays} / ${params.team} / ${params.environment}]* 🚨 
+                        |🚨 *Sizzling Sentry report - [last ${params.period} / ${params.team} / ${params.environment}]* 🚨 
                         |
                         |Top ${params.issuesCount} unresolved issues: 
                         |
@@ -37,6 +37,6 @@ class GimmeSentryReport : WhatToDo {
     }
 
     private fun extractSentryReportParams(event: SlackEvent): SentryReportParams? {
-        return SentryReportParams().takeIf { event.text.lowercase().contains("sentry report") }
+        return SentryReportParams.extractFromText(event.text).takeIf { event.text.lowercase().contains("sentry report") }
     }
 }
