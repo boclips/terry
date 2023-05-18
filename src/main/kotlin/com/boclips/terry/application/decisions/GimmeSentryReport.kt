@@ -6,20 +6,15 @@ import com.boclips.terry.application.SentryReportCreation
 import com.boclips.terry.application.SentryReportParams
 import com.boclips.terry.infrastructure.incoming.SlackEvent
 import com.boclips.terry.infrastructure.outgoing.slack.SlackMessage
-import mu.KLogging
 import org.springframework.stereotype.Component
 
 @Component
 class GimmeSentryReport : WhatToDo {
-
-    companion object : KLogging()
-
     override fun isMe(event: SlackEvent): Boolean {
         return extractSentryReportParams(event) != null
     }
 
     override fun getDecision(event: SlackEvent): Decision {
-        logger.info { "getting sentry report from $event" }
         val params = extractSentryReportParams(event)!!
         return Decision(
             log = "Generating sentry report",
