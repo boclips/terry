@@ -169,8 +169,8 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
             .andExpect(status().isOk)
             .andExpect(content().json("{}"))
 
-        assertThat(slackPoster.slackMessages[0].text).startsWith("<@U061F7AUR> Some things you can do:")
-        assertThat(slackPoster.slackMessages[0].channel).isEqualTo("C0LAN2Q65")
+        assertThat(slackPoster.waitAndGetMessages()[0].text).startsWith("<@U061F7AUR> Some things you can do:")
+        assertThat(slackPoster.waitAndGetMessages()[0].channel).isEqualTo("C0LAN2Q65")
     }
 
     @Test
@@ -209,7 +209,7 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
             .andExpect(status().isOk)
             .andExpect(content().json("{}"))
 
-        assertThat(slackPoster.slackMessages)
+        assertThat(slackPoster.waitAndGetMessages())
             .isEqualTo(
                 listOf(
                     SlackMessage(
@@ -251,7 +251,7 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
             .andExpect(status().isOk)
             .andExpect(content().json("{}"))
 
-        assertThat(slackPoster.slackMessages)
+        assertThat(slackPoster.waitAndGetMessages())
             .isEqualTo(
                 listOf(
                     SlackMessage(
@@ -303,7 +303,7 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
             .andExpect(status().isOk)
 
         assertThat(videoService.lastIdRequest).isEqualTo("asdfzxcv")
-        assertThat(slackPoster.slackMessages).isEqualTo(
+        assertThat(slackPoster.waitAndGetMessages()).isEqualTo(
             listOf(
                 SlackMessage(
                     channel = "C0LAN2Q65",
@@ -351,7 +351,7 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
             )
         ).isEqualTo(fixtureSignature)
         assertThat(kalturaClient.getBaseEntry("0_fgc6nmmt").tags).containsExactly("caption48british")
-        assertThat(slackPoster.slackMessages).isEqualTo(
+        assertThat(slackPoster.waitAndGetMessages()).isEqualTo(
             listOf(
                 SlackMessage(
                     channel = "CH1HFTDT2",
@@ -423,7 +423,7 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
             .andExpect(status().isOk)
             .andExpect(content().json("{}"))
 
-        assertThat(slackPoster.slackMessages)
+        assertThat(slackPoster.waitAndGetMessages())
             .isEqualTo(
                 listOf(
                     SlackMessage(

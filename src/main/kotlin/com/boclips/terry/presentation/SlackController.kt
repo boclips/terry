@@ -1,13 +1,8 @@
 package com.boclips.terry.presentation
 
-import com.boclips.kalturaclient.KalturaClient
 import com.boclips.terry.application.*
 import com.boclips.terry.infrastructure.incoming.Malformed
 import com.boclips.terry.infrastructure.incoming.SlackRequest
-import com.boclips.terry.infrastructure.outgoing.sentry.ComposeSentryReport
-import com.boclips.terry.infrastructure.outgoing.securecredentials.SecureCredentialRetriever
-import com.boclips.terry.infrastructure.outgoing.slack.SlackPoster
-import com.boclips.terry.infrastructure.outgoing.videos.VideoService
 import com.fasterxml.jackson.databind.ObjectMapper
 import mu.KLogging
 import org.springframework.http.HttpStatus
@@ -23,13 +18,8 @@ import javax.servlet.http.HttpServletRequest
 @RestController
 class SlackController(
     private val terry: Terry,
-    private val slackPoster: SlackPoster,
-    private val videoService: VideoService,
-    private val kalturaClient: KalturaClient,
-    private val retriever: SecureCredentialRetriever,
     private val objectMapper: ObjectMapper,
-    private val createChannelStorage: CreateChannelStorage,
-    private val composeSentryReport: ComposeSentryReport
+    private val slackControllerJobs: SlackControllerJobs
 ) {
     companion object : KLogging()
 
@@ -60,6 +50,7 @@ class SlackController(
         }
 
     private fun handleSlack(request: SlackRequest): ResponseEntity<ControllerResponse> {
+        logger.info { "Handling slack request: $request" }
         return when (val action = terry.receiveSlack(request).action) {
             is AuthenticityRejection ->
                 unauthorized()
@@ -67,6 +58,7 @@ class SlackController(
                         logger.error { action.reason }
                         logger.error { action.request.body }
                     }
+
             is MalformedRequestRejection -> badRequest()
             is ChatReply -> ok().also { chat(action) }
             is VideoRetrieval -> ok().also { getVideo(action) }
@@ -79,42 +71,28 @@ class SlackController(
     }
 
     private fun getCredential(action: ChannelUploadCredentialRetrieval) {
-        slackControllerJobs()
-            .getCredential(action)
+        slackControllerJobs.getCredential(action)
     }
 
     private fun tagVideo(action: VideoTagging) {
-        slackControllerJobs()
-            .tagVideo(action)
+        slackControllerJobs.tagVideo(action)
     }
 
     private fun getVideo(action: VideoRetrieval) {
-        slackControllerJobs()
-            .getVideo(action)
+        slackControllerJobs.getVideo(action)
     }
 
     private fun createChannelBucket(action: ChannelCreation) {
-        slackControllerJobs()
-            .createChannelBucket(action)
+        slackControllerJobs.createChannelBucket(action)
     }
 
     private fun createSentryReport(action: SentryReportCreation) {
-        slackControllerJobs().createSentryReport(action)
+        slackControllerJobs.createSentryReport(action)
     }
 
     private fun chat(action: ChatReply) {
-        slackControllerJobs()
-            .chat(action.slackMessage)
+        slackControllerJobs.chat(action.slackMessage)
     }
-
-    private fun slackControllerJobs() = SlackControllerJobs(
-        slackPoster = slackPoster,
-        videoService = videoService,
-        kalturaClient = kalturaClient,
-        retriever = retriever,
-        createChannelStorage = createChannelStorage,
-        composeSentryReport = composeSentryReport
-    )
 
     private fun ok(obj: ControllerResponse = Success) =
         ResponseEntity(obj, HttpStatus.OK)

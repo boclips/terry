@@ -1,13 +1,9 @@
 package com.boclips.terry.infrastructure.outgoing.slack
 
 import com.boclips.terry.Fake
-import com.boclips.terry.infrastructure.outgoing.slack.PostFailure
-import com.boclips.terry.infrastructure.outgoing.slack.PosterResponse
-import com.boclips.terry.infrastructure.outgoing.slack.SlackMessage
-import com.boclips.terry.infrastructure.outgoing.slack.SlackPoster
 
 class FakeSlackPoster : Fake, SlackPoster {
-    lateinit var slackMessages: List<SlackMessage>
+    private lateinit var slackMessages: List<SlackMessage>
     lateinit var urlsUsed: List<String>
     var nextResponse: PosterResponse? = null
 
@@ -32,4 +28,9 @@ class FakeSlackPoster : Fake, SlackPoster {
         }
             .also { slackMessages = slackMessages + slackMessage }
             .also { urlsUsed = urlsUsed + url }
+
+    fun waitAndGetMessages(): List<SlackMessage> {
+        Thread.sleep(100)
+        return slackMessages
+    }
 }
