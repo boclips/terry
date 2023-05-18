@@ -146,7 +146,7 @@ class Terry {
                 ChatReply(
                     slackMessage = SlackMessage(
                         channel = event.channel,
-                        text = "Sure <@${event.user}>, sizzling sentry report for you! ${response.report}"
+                        text = "Sure <@${event.user}>, sizzling sentry report for you!\n${response.report}"
                     )
                 )
             }
@@ -154,7 +154,7 @@ class Terry {
     }
 
     private fun extractSentryReportParams(text: String): SentryReportParams? {
-        return SentryReportParams.takeIf { text.lowercase().contains("sentry report") }
+        return SentryReportParams().takeIf { text.lowercase().contains("sentry report") }
     }
 
     private fun extractChannelCreationChannelName(text: String): String? =
