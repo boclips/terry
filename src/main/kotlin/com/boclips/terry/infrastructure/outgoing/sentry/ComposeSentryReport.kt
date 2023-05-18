@@ -28,7 +28,7 @@ class ComposeSentryReport(private val sentryClient: SentryClient) {
                 .sortedByDescending { it.count }
                 .take(params.issuesCount)
                 .map { issueReport(it) }
-                .joinToString(separator = System.lineSeparator())
+                .joinToString(separator = System.lineSeparator().repeat(2))
         }
 
         logger.info { "sentry report created in ${time.elapsed(MILLISECONDS)}ms" }
@@ -38,9 +38,8 @@ class ComposeSentryReport(private val sentryClient: SentryClient) {
 
     private fun issueReport(issue: SentryProjectIssue): String =
         """
-        |👉 *[${issue.count}x] [${issue.project!!.slug}] - ${issue.metadata!!.type}*
-        |   - _${issue.metadata.value}_
-        |   - ${issue.culprit}
-        |   - <${issue.permalink}|open in Sentry>
+        |👉 *[${issue.count}x] [${issue.project!!.slug}] - ${issue.metadata!!.type}* (<${issue.permalink}|details>)
+        |       • _${issue.metadata.value}_
+        |       • `${issue.culprit}`
         """.trimMargin()
 }

@@ -429,16 +429,17 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
                     SlackMessage(
                         text =
                         """
-                        |🚨 Sizzling Sentry report - [last 1d / engineering / production] 🚨 
+                        |🚨 *Sizzling Sentry report - [last 1d / engineering / production]* 🚨 
+                        |
                         |Top 5 unresolved issues: 
-                        |👉 *[5x] [service-2] - IAE*
-                        |   - _This is IAE_
-                        |   - GET /v1/users
-                        |   - <https://boclips.sentry.com|open in Sentry>
-                        |👉 *[4x] [service-1] - NPE*
-                        |   - _This is NPE_
-                        |   - GET /v1/users
-                        |   - <https://boclips.sentry.com|open in Sentry>
+                        |
+                        |👉 *[5x] [service-2] - IAE* (<https://boclips.sentry.com|details>)
+                        |       • _This is IAE_
+                        |       • `GET /v1/users`
+                        |
+                        |👉 *[4x] [service-1] - NPE* (<https://boclips.sentry.com|details>)
+                        |       • _This is NPE_
+                        |       • `GET /v1/users`
                         """.trimMargin(),
                         channel = "C0LAN2Q65"
                     )

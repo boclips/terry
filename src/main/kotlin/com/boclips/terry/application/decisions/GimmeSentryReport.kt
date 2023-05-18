@@ -24,8 +24,10 @@ class GimmeSentryReport : WhatToDo {
                         channel = event.channel,
                         text =
                         """
-                        |🚨 Sizzling Sentry report - [last ${params.periodDays} / ${params.team} / ${params.environment}] 🚨 
+                        |🚨 *Sizzling Sentry report - [last ${params.periodDays} / ${params.team} / ${params.environment}]* 🚨 
+                        |
                         |Top ${params.issuesCount} unresolved issues: 
+                        |
                         |${response.report}
                         """.trimMargin()
                     )
