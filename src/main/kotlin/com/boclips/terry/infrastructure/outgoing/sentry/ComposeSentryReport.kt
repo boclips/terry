@@ -22,16 +22,16 @@ class ComposeSentryReport(private val sentryClient: SentryClient) {
 
         val projects = sentryClient.getProjects(params)
 
-        val report = runBlocking(Dispatchers.Default) {
-            projects
-                .map { async { sentryClient.getProjectIssues(it, params) } }
-                .awaitAll()
-                .flatten()
-                .sortedByDescending { it.count }
-                .take(params.issuesCount)
-                .map { issueReport(it) }
-                .joinToString(separator = System.lineSeparator().repeat(3))
-        }
+        val report = projects.chunked(6)
+            .flatMap { chunkOfProjects ->
+                runBlocking(Dispatchers.Default) {
+                    chunkOfProjects.map { async { sentryClient.getProjectIssues(it, params) } }
+                        .awaitAll()
+                }
+            }.flatten()
+            .sortedByDescending { it.count }
+            .take(params.issuesCount)
+            .joinToString(separator = System.lineSeparator().repeat(3)) { issueReport(it) }
 
         logger.info { "sentry report created in ${time.elapsed(MILLISECONDS)}ms" }
 
