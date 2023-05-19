@@ -32,6 +32,7 @@ import testsupport.AbstractSpringIntegrationTest
 import testsupport.SentryProjectFactory
 import testsupport.SentryProjectIssueFactory
 import java.math.BigDecimal
+import java.time.LocalDateTime
 
 // This is a rotated secret, used because we hard-code an example signed by Slack with this secret
 @TestPropertySource(properties = ["slack.signingSecret=f873d35529ed55a0ab71ac068488684d"])
@@ -378,7 +379,8 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
                     project = project1,
                     count = 4,
                     type = "NPE",
-                    title = "This is NPE"
+                    title = "This is NPE",
+                    firstSeen = LocalDateTime.now().minusHours(1)
                 )
             )
         )
@@ -439,6 +441,7 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
                         |
                         |
                         |👉 *[4x] [service-1] - NPE* (<https://boclips.sentry.com|details>)
+                        |    🐛 *first appearance in the last 24hrs*
                         |       • _This is NPE_
                         |       • _GET /v1/users_
                         """.trimMargin(),

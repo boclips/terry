@@ -9,6 +9,8 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import mu.KLogging
 import org.springframework.stereotype.Component
+import java.lang.StringBuilder
+import java.util.StringJoiner
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
 @Component
@@ -37,17 +39,21 @@ class ComposeSentryReport(private val sentryClient: SentryClient) {
     }
 
     private fun issueReport(issue: SentryProjectIssue): String {
-        if (issue.metadata!!.value!!.trim().length > 2) {
-            return """
-        |👉 *[${issue.count}x] [${issue.project!!.slug}] - ${issue.metadata.type}* (<${issue.permalink}|details>)
-        |       • _${issue.metadata.value}_
-        |       • _${issue.culprit}_
-        """.trimMargin()
-        } else {
-            return """
-        |👉 *[${issue.count}x] [${issue.project!!.slug}] - ${issue.metadata.type}* (<${issue.permalink}|details>)
-        |       • _${issue.culprit}_
-        """.trimMargin()
+        val reportBuilder = StringJoiner(System.lineSeparator())
+            .add("""👉 *[${issue.count}x] [${issue.project!!.slug}] - ${issue.metadata!!.type}* (<${issue.permalink}|details>)""")
+
+        if (issue.isFirstSeenDuringLastDay()) {
+            reportBuilder.add("""    🐛 *first appearance in the last 24hrs*""")
         }
+
+        if (issue.metadata.value!!.trim().length > 2) {
+            reportBuilder.add("""       • _${issue.metadata.value}_""")
+        }
+
+        if (issue.culprit!!.trim().length > 2) {
+            reportBuilder.add("""       • _${issue.culprit}_""")
+        }
+
+        return reportBuilder.toString()
     }
 }
