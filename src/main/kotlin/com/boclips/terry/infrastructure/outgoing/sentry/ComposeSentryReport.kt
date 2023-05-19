@@ -40,17 +40,17 @@ class ComposeSentryReport(private val sentryClient: SentryClient) {
 
     private fun issueReport(issue: SentryProjectIssue): String {
         val reportBuilder = StringJoiner(System.lineSeparator())
-            .add("""👉 *[${issue.count}x] [${issue.project!!.slug}] - ${issue.metadata!!.type}* (<${issue.permalink}|details>)""")
+            .add("""👉 *[${issue.count}x] [${issue.project?.slug ?: "N/A"}] - ${issue.metadata?.type ?: "N/A"}* (<${issue.permalink}|details>)""")
 
         if (issue.isFirstSeenDuringLastDay()) {
             reportBuilder.add("""    🐛 *first appearance in the last 24hrs*""")
         }
 
-        if (issue.metadata.value!!.trim().length > 2) {
+        if (issue.metadata?.value != null && issue.metadata.value.trim().length > 2) {
             reportBuilder.add("""       • _${issue.metadata.value}_""")
         }
 
-        if (issue.culprit!!.trim().length > 2) {
+        if (issue.culprit != null && issue.culprit.trim().length > 2) {
             reportBuilder.add("""       • _${issue.culprit}_""")
         }
 
