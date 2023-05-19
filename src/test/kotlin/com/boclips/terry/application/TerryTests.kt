@@ -81,6 +81,7 @@ class TerryTests {
         assertThat(reply.slackMessage.text).contains("video 1234 (retrieves a video and displays a menu)")
         assertThat(reply.slackMessage.text).contains("safenote a-channel-name (retrieves a new Safenote for an existing channel's upload credentials)")
         assertThat(reply.slackMessage.text).contains("bucket for a-channel-name (creates a bucket in AWS for a-channel-name)")
+        assertThat(reply.slackMessage.text).contains("sentry report [issues 1|5|100|etc] [environment staging|production] [team engineering|data] [period 1h|1d|etc|]")
         assertThat(decision.log).contains("Some things you can do")
     }
 
