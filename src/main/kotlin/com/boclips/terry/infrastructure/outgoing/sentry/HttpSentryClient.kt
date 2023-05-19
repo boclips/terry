@@ -3,60 +3,71 @@ package com.boclips.terry.infrastructure.outgoing.sentry
 import com.boclips.terry.application.SentryReportParams
 import com.boclips.terry.config.SentryProperties
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.type.CollectionType
 import mu.KLogging
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.Response
+import org.apache.http.client.utils.URIBuilder
 import org.springframework.stereotype.Component
-import java.io.IOException
+import java.net.URL
 
 @Component
 class HttpSentryClient(private val sentryProperties: SentryProperties) : SentryClient {
+    companion object : KLogging()
 
     private val httpClient: OkHttpClient = OkHttpClient()
+    private val mapper = ObjectMapper()
 
-    companion object : KLogging()
     override fun getProjects(params: SentryReportParams): List<SentryProject> {
-        val request = Request.Builder()
-            .url(projectsUrl(params))
-            .get()
-            .addHeader("Authorization", "Bearer " + sentryProperties.token)
-            .build()
+        val response = httpClient.newCall(buildRequest(projectsUrl(params))).execute()
 
-        return httpClient.newCall(request).execute().let { response ->
-            if (!response.isSuccessful) throw IOException("Sentry API call failed!")
+        verifyResponseSuccessful(response)
 
-            val mapper = ObjectMapper()
-            return@let mapper.readValue<List<SentryProject>>(
-                response.body!!.string(),
-                mapper.typeFactory.constructCollectionType(List::class.java, SentryProject::class.java)
-            )
-        }
-    }
+        return mapper.readValue(response.body!!.string(), buildListTypeFor(SentryProject::class.java, mapper))
 
-    private fun projectsUrl(params: SentryReportParams): String {
-        return "https://boclips.sentry.io/api/0/teams/boclips/${params.team}/projects/"
     }
 
     override fun getProjectIssues(project: SentryProject, params: SentryReportParams): List<SentryProjectIssue> {
         logger.info { "Getting issues for ${project.slug}" }
-        val request = Request.Builder()
-            .url(projectIssuesUrl(project, params))
+
+        val response = httpClient.newCall(buildRequest(projectIssuesUrl(project, params))).execute()
+
+        verifyResponseSuccessful(response)
+
+        return mapper.readValue(response.body!!.string(), buildListTypeFor(SentryProjectIssue::class.java, mapper))
+    }
+
+    private fun buildRequest(url: URL): Request {
+        return Request.Builder()
+            .url(url)
             .get()
             .addHeader("Authorization", "Bearer " + sentryProperties.token)
             .build()
+    }
 
-        return OkHttpClient().newCall(request).execute().let { response ->
-            if (!response.isSuccessful) throw IOException("Sentry API call failed!")
-
-            val mapper = ObjectMapper()
-            return@let mapper.readValue<List<SentryProjectIssue>>(
-                response.body!!.string(),
-                mapper.typeFactory.constructCollectionType(List::class.java, SentryProjectIssue::class.java)
-            )
+    private fun verifyResponseSuccessful(response: Response) {
+        if (!response.isSuccessful) {
+            throw SentryApiException(response.message)
         }
     }
 
-    private fun projectIssuesUrl(project: SentryProject, params: SentryReportParams): String {
-        return "https://boclips.sentry.io/api/0/organizations/boclips/issues/?environment=${params.environment}&project=${project.id}&query=&sort=freq&statsPeriod=${params.period}&limit=${params.issuesCount}&query=is:unresolved"
+    private fun buildListTypeFor(type: Class<*>, mapper: ObjectMapper): CollectionType {
+        return mapper.typeFactory.constructCollectionType(List::class.java, type)
+    }
+
+    private fun projectsUrl(params: SentryReportParams): URL {
+        return URIBuilder("https://boclips.sentry.io/api/0/teams/boclips/${params.team}/projects/").build().toURL()
+    }
+
+    private fun projectIssuesUrl(project: SentryProject, params: SentryReportParams): URL {
+        return URIBuilder("https://boclips.sentry.io/api/0/organizations/boclips/issues/")
+            .addParameter("environment", params.environment)
+            .addParameter("project", project.id!!)
+            .addParameter("query", "is:unresolved")
+            .addParameter("sort", "freq")
+            .addParameter("statsPeriod", params.period)
+            .addParameter("limit", params.issuesCount.toString())
+            .build().toURL()
     }
 }
