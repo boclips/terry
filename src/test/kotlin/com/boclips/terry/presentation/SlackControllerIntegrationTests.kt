@@ -61,6 +61,7 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
         videoService.reset()
         credentialRetriever.reset()
         clock.reset()
+        sentryClient.clear()
     }
 
     @Test
@@ -444,6 +445,68 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
                         |    🐛 *first appearance in the last 24hrs*
                         |       • _This is NPE_
                         |       • _GET /v1/users_
+                        """.trimMargin(),
+                        channel = "C0LAN2Q65"
+                    )
+                )
+            )
+    }
+
+    @Test
+    fun `responds with failure message when sentry client throws`() {
+        slackPoster.respondWith(PostSuccess(timestamp = BigDecimal(1231231)))
+
+        sentryClient.throwExceptionWhenInteracting("something bad happened")
+        val project1 = SentryProjectFactory.sample("1", "service-1")
+
+        sentryClient.addProjectWithIssues(
+            project = project1,
+            listOf(
+                SentryProjectIssueFactory.sample(
+                    project = project1,
+                    count = 4,
+                    type = "NPE",
+                    title = "This is NPE",
+                    firstSeen = LocalDateTime.now().minusHours(1)
+                )
+            )
+        )
+        postFromSlack(
+            body = """
+            {
+                "token": "ZZZZZZWSxiZZZ2yIvs3peJ",
+                "team_id": "T061EG9R6",
+                "api_app_id": "A0MDYCDME",
+                "event": {
+                    "funny_unknown_property": "to-test-ignoring-unknown-properties",
+                    "type": "app_mention",
+                    "user": "U061F7AUR",
+                    "text": "Hey <@U0LAN0Z89>, could you please serve me a cool beer and sentry report?",
+                    "ts": "1515449438.000011",
+                    "channel": "C0LAN2Q65",
+                    "event_ts": "1515449438000011"
+                },
+                "type": "event_callback",
+                "event_id": "Ev0MDYGDKJ",
+                "event_time": 1515449438000011,
+                "authed_users": [
+                    "U0LAN0Z89"
+                ]
+            }
+            """.trimIndent(),
+            path = "/slack"
+        )
+            .andExpect(status().isOk)
+            .andExpect(content().json("{}"))
+
+        assertThat(slackPoster.waitAndGetMessages())
+            .isEqualTo(
+                listOf(
+                    SlackMessage(
+                        text =
+                        """
+                        |I am terribly sorry but something stopped me from generating that report!
+                        |The reason of my failure is: something bad happened
                         """.trimMargin(),
                         channel = "C0LAN2Q65"
                     )

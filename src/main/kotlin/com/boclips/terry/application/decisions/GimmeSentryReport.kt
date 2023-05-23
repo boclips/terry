@@ -19,19 +19,7 @@ class GimmeSentryReport : WhatToDo {
         return Decision(
             log = "Generating sentry report",
             action = SentryReportCreation(params) { response ->
-                ChatReply(
-                    slackMessage = SlackMessage(
-                        channel = event.channel,
-                        text =
-                        """
-                        |🚨 *Sizzling Sentry report - [last ${params.period} / ${params.team} / ${params.environment}]* 🚨 
-                        |
-                        |Top ${params.issuesCount} unresolved issues: 
-                        |
-                        |${response.report}
-                        """.trimMargin()
-                    )
-                )
+                ChatReply(SlackMessage(channel = event.channel, text = response.generate()))
             }
         )
     }

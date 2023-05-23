@@ -12,12 +12,20 @@ import java.io.IOException
 class FakeSentryClient : SentryClient {
 
     private val issuesByProject = mutableMapOf<SentryProject, List<SentryProjectIssue>>()
+    private var exceptionOnInteractionMessage: String? = null
 
     override fun getProjects(params: SentryReportParams): List<SentryProject> {
+        if(exceptionOnInteractionMessage != null) {
+            throw RuntimeException(exceptionOnInteractionMessage)
+        }
         return issuesByProject.keys.toList()
     }
 
     override fun getProjectIssues(project: SentryProject, params: SentryReportParams): List<SentryProjectIssue> {
+        if(exceptionOnInteractionMessage != null) {
+            throw RuntimeException(exceptionOnInteractionMessage)
+        }
+
         return issuesByProject[project]
             ?.sortedByDescending { it.count }
             ?.take(params.issuesCount)
@@ -30,5 +38,10 @@ class FakeSentryClient : SentryClient {
 
     fun clear() {
         issuesByProject.clear()
+        exceptionOnInteractionMessage = null
+    }
+
+    fun throwExceptionWhenInteracting(exceptionMessage: String) {
+        exceptionOnInteractionMessage = exceptionMessage
     }
 }

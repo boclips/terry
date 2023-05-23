@@ -1,7 +1,9 @@
 package com.boclips.terry.infrastructure.outgoing.sentry
 
+import com.boclips.terry.application.SentryReportFailure
 import com.boclips.terry.application.SentryReportParams
 import com.boclips.terry.application.SentryReportResponse
+import com.boclips.terry.application.SentryReportSuccessful
 import com.google.common.base.Stopwatch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -9,8 +11,6 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import mu.KLogging
 import org.springframework.stereotype.Component
-import java.lang.StringBuilder
-import java.util.StringJoiner
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
 @Component
@@ -20,40 +20,25 @@ class ComposeSentryReport(private val sentryClient: SentryClient) {
     operator fun invoke(params: SentryReportParams): SentryReportResponse {
         val time = Stopwatch.createStarted()
 
-        val projects = sentryClient.getProjects(params)
+        return try {
+            val projects = sentryClient.getProjects(params)
 
-        val report = projects.chunked(6)
-            .flatMap { chunkOfProjects ->
-                runBlocking(Dispatchers.Default) {
-                    chunkOfProjects.map { async { sentryClient.getProjectIssues(it, params) } }
-                        .awaitAll()
-                }
-            }.flatten()
-            .sortedByDescending { it.count }
-            .take(params.issuesCount)
-            .joinToString(separator = System.lineSeparator().repeat(3)) { issueReport(it) }
+            val sentryIssuesForReport = projects.chunked(6)
+                .flatMap { chunkOfProjects ->
+                    runBlocking(Dispatchers.Default) {
+                        chunkOfProjects.map { async { sentryClient.getProjectIssues(it, params) } }
+                            .awaitAll()
+                    }
+                }.flatten()
+                .sortedByDescending { it.count }
+                .take(params.issuesCount)
 
-        logger.info { "sentry report created in ${time.elapsed(MILLISECONDS)}ms" }
+            logger.info { "sentry report created in ${time.elapsed(MILLISECONDS)}ms" }
+            SentryReportSuccessful(sentryIssuesForReport, params)
 
-        return SentryReportResponse(report)
-    }
-
-    private fun issueReport(issue: SentryProjectIssue): String {
-        val reportBuilder = StringJoiner(System.lineSeparator())
-            .add("""👉 *[${issue.count}x] [${issue.project?.slug ?: "N/A"}] - ${issue.metadata?.type ?: "N/A"}* (<${issue.permalink}|details>)""")
-
-        if (issue.isFirstSeenDuringLastDay()) {
-            reportBuilder.add("""    🐛 *first appearance in the last 24hrs*""")
+        } catch (exception: Exception) {
+            logger.warn(exception) { "Composing sentry report failed! Creating report failure instead" }
+            SentryReportFailure(exception.message)
         }
-
-        if (issue.metadata?.value != null && issue.metadata.value.trim().length > 2) {
-            reportBuilder.add("""       • _${issue.metadata.value}_""")
-        }
-
-        if (issue.culprit != null && issue.culprit.trim().length > 2) {
-            reportBuilder.add("""       • _${issue.culprit}_""")
-        }
-
-        return reportBuilder.toString()
     }
 }
