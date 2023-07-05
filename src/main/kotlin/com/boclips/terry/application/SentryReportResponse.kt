@@ -8,13 +8,25 @@ sealed class SentryReportResponse {
 }
 
 data class SentryReportSuccessful(val sentryIssues: List<SentryProjectIssue>, val params: SentryReportParams) : SentryReportResponse() {
-    override fun generate() = """
+    override fun generate(): String {
+        if(sentryIssues.isEmpty()) {
+            return generateReportWithNoIssues()
+        }
+
+        return """
         |🚨 *Sizzling Sentry report - [last ${params.period} / ${params.team} / ${params.environment} / threshold ${params.threshold}]* 🚨 
         |
         |Top ${params.issuesCount} unresolved issues: 
         |
         |${generateIssuesSection()}
         """.trimMargin()
+    }
+
+    private fun generateReportWithNoIssues() = """
+            |🚨 *Sizzling Sentry report - [last ${params.period} / ${params.team} / ${params.environment} / threshold ${params.threshold}]* 🚨 
+            |
+            |Looks like there have been no issues for given parameters! 🥹
+            """.trimMargin()
 
     private fun generateIssuesSection(): String {
         return sentryIssues
