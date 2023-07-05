@@ -432,7 +432,7 @@ class SlackControllerIntegrationTests : AbstractSpringIntegrationTest() {
                     SlackMessage(
                         text =
                         """
-                        |🚨 *Sizzling Sentry report - [last 1d / engineering / production]* 🚨 
+                        |🚨 *Sizzling Sentry report - [last 1d / engineering / production / threshold 0]* 🚨 
                         |
                         |Top 5 unresolved issues: 
                         |

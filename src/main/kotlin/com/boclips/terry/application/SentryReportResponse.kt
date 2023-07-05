@@ -9,7 +9,7 @@ sealed class SentryReportResponse {
 
 data class SentryReportSuccessful(val sentryIssues: List<SentryProjectIssue>, val params: SentryReportParams) : SentryReportResponse() {
     override fun generate() = """
-        |🚨 *Sizzling Sentry report - [last ${params.period} / ${params.team} / ${params.environment}]* 🚨 
+        |🚨 *Sizzling Sentry report - [last ${params.period} / ${params.team} / ${params.environment} / threshold ${params.threshold}]* 🚨 
         |
         |Top ${params.issuesCount} unresolved issues: 
         |
