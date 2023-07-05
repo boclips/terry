@@ -4,7 +4,8 @@ data class SentryReportParams(
     val period: String = "1d",
     val team: String = "engineering",
     val issuesCount: Int = 5,
-    val environment: String = "production"
+    val environment: String = "production",
+    val threshold: Int = 0,
 ) {
     companion object {
         fun extractFromText(text: String): SentryReportParams {
@@ -12,7 +13,8 @@ data class SentryReportParams(
             val issuesCount = getIssuesCount(text) ?: 5
             val team = getTeam(text) ?: "engineering"
             val environment = getEnvironment(text) ?: "production"
-            return SentryReportParams(period, team, issuesCount, environment)
+            val threshold = getThreshold(text) ?: 0
+            return SentryReportParams(period, team, issuesCount, environment, threshold)
         }
 
         private fun getPeriod(text: String): String? {
@@ -23,6 +25,12 @@ data class SentryReportParams(
 
         private fun getIssuesCount(text: String): Int? {
             return """.*issues (\d+).*""".toRegex().let { pattern ->
+                pattern.matchEntire(text)?.groups?.get(1)?.value?.toInt()
+            }
+        }
+
+        private fun getThreshold(text: String): Int? {
+            return """.*threshold (\d+).*""".toRegex().let { pattern ->
                 pattern.matchEntire(text)?.groups?.get(1)?.value?.toInt()
             }
         }

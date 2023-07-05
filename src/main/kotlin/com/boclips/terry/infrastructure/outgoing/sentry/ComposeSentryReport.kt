@@ -32,6 +32,7 @@ class ComposeSentryReport(private val sentryClient: SentryClient) {
                 }.flatten()
                 .sortedByDescending { it.count }
                 .take(params.issuesCount)
+                .filter { it.count?.let { count -> count > params.threshold } ?: true }
 
             logger.info { "sentry report created in ${time.elapsed(MILLISECONDS)}ms" }
             SentryReportSuccessful(sentryIssuesForReport, params)

@@ -28,6 +28,6 @@ class DunnoWhatToDo {
         video 1234 (retrieves a video and displays a menu)
         safenote a-channel-name (retrieves a new Safenote for an existing channel's upload credentials)
         bucket for a-channel-name (creates a bucket in AWS for a-channel-name)
-        sentry report [issues 1|5|100|etc] [environment staging|production] [team engineering|data] [period 1h|1d|etc|]
+        sentry report [issues 1|5|100|etc] [environment staging|production] [team engineering|data] [period 1h|1d|etc|] [threshold 1|2|etc]
     """.trimIndent()
 }
