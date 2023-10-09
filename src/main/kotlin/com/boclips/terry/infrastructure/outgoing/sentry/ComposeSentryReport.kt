@@ -23,8 +23,9 @@ class ComposeSentryReport(private val sentryClient: SentryClient) {
         return try {
             val projects = sentryClient.getProjects(params)
 
-            val sentryIssuesForReport = projects.chunked(6)
-                .flatMap { chunkOfProjects ->
+            val sentryIssuesForReport = projects.chunked(3)
+                .flatMapIndexed { chunkIndex, chunkOfProjects ->
+                    logger.info { "Chunk ${chunkIndex + 1} - getting issues" }
                     runBlocking(Dispatchers.Default) {
                         chunkOfProjects.map { async { sentryClient.getProjectIssues(it, params) } }
                             .awaitAll()
