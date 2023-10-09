@@ -1,7 +1,7 @@
 package com.boclips.terry.infrastructure.outgoing.videos
 
 import com.boclips.videos.api.httpclient.VideosClient
-    import feign.FeignException
+import feign.FeignException
 import mu.KLogging
 import org.springframework.stereotype.Component
 import org.springframework.web.client.HttpServerErrorException
@@ -43,7 +43,7 @@ class HTTPVideoService(private val videosClient: VideosClient) : VideoService {
                 Error("Something went wrong fetching video with id $videoId - ${ex.message}")
             }
         } catch (ex: HttpServerErrorException) {
-            logger.error { "Error fetching video $videoId: ${ex}" }
+            logger.error { "Error fetching video $videoId: $ex" }
             Error(message = "Server bad: $ex")
         }
     }

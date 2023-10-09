@@ -36,7 +36,7 @@ data class VideoTagging(
 data class ChannelCreation(
     val channelName: String,
     val onComplete: (ChannelCreationResponse) -> ChatReply
-): Action()
+) : Action()
 
 data class SentryReportCreation(
     val params: SentryReportParams,

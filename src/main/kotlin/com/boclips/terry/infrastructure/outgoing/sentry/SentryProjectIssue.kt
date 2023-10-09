@@ -20,8 +20,8 @@ data class SentryProjectIssue(
     @JsonProperty("lifetime")
     fun extractFirstSeen(lifetime: Map<String, String>) {
         firstSeen = try {
-            LocalDateTime.parse(lifetime["firstSeen"], DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'"))}
-        catch (ex: Exception) {
+            LocalDateTime.parse(lifetime["firstSeen"], DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'"))
+        } catch (ex: Exception) {
             null
         }
     }

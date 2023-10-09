@@ -12,8 +12,7 @@ class FakePolicyRepository : PolicyRepository {
     override fun delete(policyArn: String): Boolean =
         policies.remove(policyArn)
 
-
-    private fun getPolicyArn(storageName: String) = "arn:aws:iam::${storageName}"
+    private fun getPolicyArn(storageName: String) = "arn:aws:iam::$storageName"
 
     fun existsFor(channelStorageName: String) = policies.contains(getPolicyArn(channelStorageName))
 }

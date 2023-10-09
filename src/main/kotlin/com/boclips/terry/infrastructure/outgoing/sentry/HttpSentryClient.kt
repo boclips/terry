@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.type.CollectionType
 import mu.KLogging
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.Response
 import org.apache.http.client.utils.URIBuilder
 import org.springframework.stereotype.Component
 import java.net.URL

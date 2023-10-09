@@ -20,7 +20,8 @@ class AWSNotificationServiceTest {
         val notificationService =
             AWSNotificationService(
                 s3Client = fakeS3,
-                awsNotificationProperties = AWSNotificationProperties().apply { this.channelTopicArn = "fake-arn" })
+                awsNotificationProperties = AWSNotificationProperties().apply { this.channelTopicArn = "fake-arn" }
+            )
 
         notificationService.addBucketNotification("our-test-bucket")
         val notificationConfiguration = argumentCaptor<BucketNotificationConfiguration>()

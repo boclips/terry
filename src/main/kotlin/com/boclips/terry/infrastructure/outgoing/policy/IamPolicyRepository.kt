@@ -36,7 +36,7 @@ class IamPolicyRepository : PolicyRepository {
                         {
                             "Effect": "Allow",
                             "Resource": [
-                                "arn:aws:s3:::${bucketName}/*"
+                                "arn:aws:s3:::$bucketName/*"
                             ],
                             "Action": [
                                 "s3:PutObject"
@@ -45,7 +45,7 @@ class IamPolicyRepository : PolicyRepository {
                         {
                             "Effect": "Allow",
                             "Resource": [
-                                "arn:aws:s3:::${bucketName}"
+                                "arn:aws:s3:::$bucketName"
                             ],
                             "Action": [
                                 "s3:ListBucket",
@@ -65,5 +65,3 @@ class IamPolicyRepository : PolicyRepository {
             }
         """.trimMargin()
 }
-
-

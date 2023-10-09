@@ -10,10 +10,12 @@ class SentryReportResponseTest {
         val params = SentryReportParams()
         val report = SentryReportSuccessful(emptyList(), params).generate()
 
-        Assertions.assertThat(report).isEqualTo("""
+        Assertions.assertThat(report).isEqualTo(
+            """
         |🚨 *Sizzling Sentry report - [last ${params.period} / ${params.team} / ${params.environment} / threshold ${params.threshold}]* 🚨 
         |
         |Looks like there have been no issues for given parameters! 🥹
-        """.trimMargin())
+            """.trimMargin()
+        )
     }
 }

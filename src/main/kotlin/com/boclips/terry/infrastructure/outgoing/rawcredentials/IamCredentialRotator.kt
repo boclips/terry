@@ -3,7 +3,11 @@ package com.boclips.terry.infrastructure.outgoing.rawcredentials
 import com.amazonaws.auth.EnvironmentVariableCredentialsProvider
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.identitymanagement.AmazonIdentityManagementClientBuilder
-import com.amazonaws.services.identitymanagement.model.*
+import com.amazonaws.services.identitymanagement.model.CreateAccessKeyRequest
+import com.amazonaws.services.identitymanagement.model.DeleteAccessKeyRequest
+import com.amazonaws.services.identitymanagement.model.LimitExceededException
+import com.amazonaws.services.identitymanagement.model.ListAccessKeysRequest
+import com.amazonaws.services.identitymanagement.model.NoSuchEntityException
 
 class IamCredentialRotator : RawCredentialRetriever {
     override fun get(channelName: String): RawCredentialResponse {
@@ -33,5 +37,4 @@ class IamCredentialRotator : RawCredentialRetriever {
             return RawCredentialNotFound
         }
     }
-
 }

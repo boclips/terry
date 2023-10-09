@@ -15,14 +15,14 @@ class FakeSentryClient : SentryClient {
     private var exceptionOnInteractionMessage: String? = null
 
     override fun getProjects(params: SentryReportParams): List<SentryProject> {
-        if(exceptionOnInteractionMessage != null) {
+        if (exceptionOnInteractionMessage != null) {
             throw RuntimeException(exceptionOnInteractionMessage)
         }
         return issuesByProject.keys.toList()
     }
 
     override fun getProjectIssues(project: SentryProject, params: SentryReportParams): List<SentryProjectIssue> {
-        if(exceptionOnInteractionMessage != null) {
+        if (exceptionOnInteractionMessage != null) {
             throw RuntimeException(exceptionOnInteractionMessage)
         }
 

@@ -1,6 +1,15 @@
 package com.boclips.terry.presentation
 
-import com.boclips.terry.application.*
+import com.boclips.terry.application.AuthenticityRejection
+import com.boclips.terry.application.ChannelCreation
+import com.boclips.terry.application.ChannelUploadCredentialRetrieval
+import com.boclips.terry.application.ChatReply
+import com.boclips.terry.application.MalformedRequestRejection
+import com.boclips.terry.application.SentryReportCreation
+import com.boclips.terry.application.Terry
+import com.boclips.terry.application.VerificationResponse
+import com.boclips.terry.application.VideoRetrieval
+import com.boclips.terry.application.VideoTagging
 import com.boclips.terry.infrastructure.incoming.Malformed
 import com.boclips.terry.infrastructure.incoming.SlackRequest
 import com.fasterxml.jackson.databind.ObjectMapper

@@ -4,4 +4,3 @@ sealed class ChannelDeletionResponse
 
 object ChannelDeletionSuccess : ChannelDeletionResponse()
 object ChannelDeletionFailed : ChannelDeletionResponse()
-

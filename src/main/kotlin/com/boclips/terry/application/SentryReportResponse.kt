@@ -9,7 +9,7 @@ sealed class SentryReportResponse {
 
 data class SentryReportSuccessful(val sentryIssues: List<SentryProjectIssue>, val params: SentryReportParams) : SentryReportResponse() {
     override fun generate(): String {
-        if(sentryIssues.isEmpty()) {
+        if (sentryIssues.isEmpty()) {
             return generateReportWithNoIssues()
         }
 
@@ -26,7 +26,7 @@ data class SentryReportSuccessful(val sentryIssues: List<SentryProjectIssue>, va
             |🚨 *Sizzling Sentry report - [last ${params.period} / ${params.team} / ${params.environment} / threshold ${params.threshold}]* 🚨 
             |
             |Looks like there have been no issues for given parameters! 🥹
-            """.trimMargin()
+    """.trimMargin()
 
     private fun generateIssuesSection(): String {
         return sentryIssues
@@ -58,6 +58,6 @@ data class SentryReportFailure(val failureMessage: String?) : SentryReportRespon
         return """
         |I am terribly sorry but something stopped me from generating that report!
         |The reason of my failure is: $failureMessage
-    """.trimMargin()
+        """.trimMargin()
     }
 }

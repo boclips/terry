@@ -44,7 +44,7 @@ class Terry(val eventNotificationDecisionMaker: EventNotificationDecisionMaker) 
 
     fun receiveSlack(request: SlackRequest): Decision =
         when (request) {
-            is VerificationRequest -> Decision(VerificationResponse(request.challenge), "Responding to verification challenge", )
+            is VerificationRequest -> Decision(VerificationResponse(request.challenge), "Responding to verification challenge")
             is EventNotification -> handleEventNotification(request.event)
             is BlockActions -> handleTranscriptRequest(blockActionsToTranscriptRequest(request))
             is Malformed -> Decision(MalformedRequestRejection, "Malformed request")
@@ -81,14 +81,17 @@ class Terry(val eventNotificationDecisionMaker: EventNotificationDecisionMaker) 
                                 )
                             )
                     }
-                })
+                }
+            )
         } ?: MalformedRequestRejection
 
     private fun blockActionsToTranscriptRequest(blockActions: BlockActions): TranscriptRequest =
-        (jacksonObjectMapper().readValue(
-            blockActions.actions.first().selectedOption.value,
-            TranscriptCodeForEntryId::class.java
-        ))
+        (
+            jacksonObjectMapper().readValue(
+                blockActions.actions.first().selectedOption.value,
+                TranscriptCodeForEntryId::class.java
+            )
+            )
             .let { videoCode ->
                 TranscriptRequest(
                     entryId = videoCode.entryId,

@@ -1,12 +1,11 @@
 package com.boclips.terry.config
 
-import com.boclips.videos.api.httpclient.ChannelsClient
 import com.boclips.videos.api.httpclient.VideosClient
 import com.boclips.videos.api.httpclient.helper.ServiceAccountCredentials
 import com.boclips.videos.api.httpclient.helper.ServiceAccountTokenFactory
+import feign.okhttp.OkHttpClient
 import feign.opentracing.TracingClient
 import io.opentracing.Tracer
-import feign.okhttp.OkHttpClient
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile

@@ -1,5 +1,8 @@
 package com.boclips.terry.infrastructure.outgoing.securecredentials
 
+import com.boclips.terry.infrastructure.outgoing.rawcredentials.RawCredential
+import com.boclips.terry.infrastructure.outgoing.rawcredentials.RawCredentialNotFound
+import com.boclips.terry.infrastructure.outgoing.rawcredentials.RawCredentialRetriever
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
@@ -7,9 +10,6 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
-import com.boclips.terry.infrastructure.outgoing.rawcredentials.RawCredential
-import com.boclips.terry.infrastructure.outgoing.rawcredentials.RawCredentialNotFound
-import com.boclips.terry.infrastructure.outgoing.rawcredentials.RawCredentialRetriever
 
 class SafenoteRetriever(val rawRetriever: RawCredentialRetriever, val url: String = "https://safenote.co/api/note") : SecureCredentialRetriever {
     override fun get(channelName: String): SecureCredentialResponse =

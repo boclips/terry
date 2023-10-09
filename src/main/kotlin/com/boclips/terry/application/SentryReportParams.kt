@@ -5,7 +5,7 @@ data class SentryReportParams(
     val team: String = "engineering",
     val issuesCount: Int = 5,
     val environment: String = "production",
-    val threshold: Int = 0,
+    val threshold: Int = 0
 ) {
     companion object {
         fun extractFromText(text: String): SentryReportParams {

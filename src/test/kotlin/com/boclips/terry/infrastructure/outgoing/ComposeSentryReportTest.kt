@@ -29,7 +29,7 @@ class ComposeSentryReportTest {
             listOf(
                 SentryProjectIssueFactory.sample(project = project1, count = 2),
                 SentryProjectIssueFactory.sample(project = project1, count = 1),
-                SentryProjectIssueFactory.sample(project = project1, count = 0),
+                SentryProjectIssueFactory.sample(project = project1, count = 0)
             )
         )
         val reportResponse = ComposeSentryReport(sentryClient).invoke(SentryReportParams(threshold = 1))

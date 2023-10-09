@@ -1,6 +1,5 @@
 package com.boclips.terry.infrastructure.outgoing.storage
 
-
 class FakeStorageRepository : StorageRepository {
     private val storageNames = mutableListOf<String>()
 

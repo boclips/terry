@@ -1,17 +1,17 @@
 package com.boclips.terry.application
 
-import com.boclips.terry.application.decisions.EventNotificationDecisionMaker
 import com.boclips.terry.application.decisions.DunnoWhatToDo
+import com.boclips.terry.application.decisions.EventNotificationDecisionMaker
 import com.boclips.terry.application.decisions.GimmeBucketForChannel
 import com.boclips.terry.application.decisions.GimmeSafenoteForChannel
 import com.boclips.terry.application.decisions.GimmeSentryReport
 import com.boclips.terry.application.decisions.GimmeVideo
-import com.boclips.terry.infrastructure.incoming.SlackEvent
 import com.boclips.terry.infrastructure.incoming.BlockAction
 import com.boclips.terry.infrastructure.incoming.BlockActionIdentifiable
 import com.boclips.terry.infrastructure.incoming.BlockActionSelectedOption
 import com.boclips.terry.infrastructure.incoming.BlockActions
 import com.boclips.terry.infrastructure.incoming.EventNotification
+import com.boclips.terry.infrastructure.incoming.SlackEvent
 import com.boclips.terry.infrastructure.incoming.VerificationRequest
 import com.boclips.terry.infrastructure.outgoing.securecredentials.CredentialNotFound
 import com.boclips.terry.infrastructure.outgoing.securecredentials.SafenoteFailure
@@ -262,11 +262,13 @@ class TerryTests {
 
     @Test
     fun `when credentials are retrieved successfully reply with a credential link`() {
-        when (val action = mentionTerry(
-            "safenote for mythology-and-fiction_explained",
-            user = "THAD123",
-            channel = "#engineering"
-        ).action) {
+        when (
+            val action = mentionTerry(
+                "safenote for mythology-and-fiction_explained",
+                user = "THAD123",
+                channel = "#engineering"
+            ).action
+        ) {
             is ChannelUploadCredentialRetrieval ->
                 assertThat(
                     action.onComplete(
@@ -288,11 +290,13 @@ class TerryTests {
 
     @Test
     fun `when credentials are not found tell user`() {
-        when (val action = mentionTerry(
-            "safenote for mythology-and-fiction_explained",
-            user = "THAD123",
-            channel = "#engineering"
-        ).action) {
+        when (
+            val action = mentionTerry(
+                "safenote for mythology-and-fiction_explained",
+                user = "THAD123",
+                channel = "#engineering"
+            ).action
+        ) {
             is ChannelUploadCredentialRetrieval ->
                 assertThat(
                     action.onComplete(
@@ -314,11 +318,13 @@ class TerryTests {
 
     @Test
     fun `when Safenote fails tell user`() {
-        when (val action = mentionTerry(
-            "safenote for mythology-and-fiction_explained",
-            user = "THAD123",
-            channel = "#engineering"
-        ).action) {
+        when (
+            val action = mentionTerry(
+                "safenote for mythology-and-fiction_explained",
+                user = "THAD123",
+                channel = "#engineering"
+            ).action
+        ) {
             is ChannelUploadCredentialRetrieval ->
                 assertThat(
                     action.onComplete(
@@ -340,11 +346,13 @@ class TerryTests {
 
     @Test
     fun `successful receipt of Kaltura video triggers a chat message with the Kaltura details`() {
-        when (val action = mentionTerry(
-            "Yo can I get video myvid123 please?",
-            user = "THAD123",
-            channel = "#engineering"
-        ).action) {
+        when (
+            val action = mentionTerry(
+                "Yo can I get video myvid123 please?",
+                user = "THAD123",
+                channel = "#engineering"
+            ).action
+        ) {
             is VideoRetrieval ->
                 assertThat(
                     action.onComplete(
@@ -382,11 +390,13 @@ class TerryTests {
 
     @Test
     fun `successful receipt of YouTube video triggers a chat message with the YouTube details`() {
-        when (val action = mentionTerry(
-            "Yo can I get video myvid123 please?",
-            user = "THAD123",
-            channel = "#engineering"
-        ).action) {
+        when (
+            val action = mentionTerry(
+                "Yo can I get video myvid123 please?",
+                user = "THAD123",
+                channel = "#engineering"
+            ).action
+        ) {
             is VideoRetrieval ->
                 assertThat(
                     action.onComplete(
@@ -423,11 +433,13 @@ class TerryTests {
 
     @Test
     fun `missing video triggers a chat message with an apology`() {
-        when (val action = mentionTerry(
-            "video myvid123 doesn't even exist, m8",
-            user = "THAD123",
-            channel = "#engineering"
-        ).action) {
+        when (
+            val action = mentionTerry(
+                "video myvid123 doesn't even exist, m8",
+                user = "THAD123",
+                channel = "#engineering"
+            ).action
+        ) {
             is VideoRetrieval ->
                 assertThat(action.onComplete(MissingVideo(videoId = "myvid123")))
                     .isEqualTo(
@@ -445,11 +457,13 @@ class TerryTests {
 
     @Test
     fun `video service server error triggers a chat message with some blame`() {
-        when (val action = mentionTerry(
-            "please find video thatbreaksvideoservice",
-            user = "THAD123",
-            channel = "#engineering"
-        ).action) {
+        when (
+            val action = mentionTerry(
+                "please find video thatbreaksvideoservice",
+                user = "THAD123",
+                channel = "#engineering"
+            ).action
+        ) {
             is VideoRetrieval ->
                 assertThat(action.onComplete(Error(message = "500 REALLY BAD")))
                     .isEqualTo(
@@ -468,18 +482,20 @@ class TerryTests {
     @Test
     fun `transcript request translates the code into Kaltura language`() {
         assertThat(
-            (terry.receiveSlack(
-                BlockActions(
-                    actions = listOf(
-                        BlockAction(
-                            selectedOption = BlockActionSelectedOption("""{"code":"british-english","entryId":"a_Kaltura1D"}""")
-                        )
-                    ),
-                    channel = BlockActionIdentifiable(id = "#legacyOrderDocuments"),
-                    user = BlockActionIdentifiable(id = "THAD666"),
-                    responseUrl = "https://response.to.me/please"
-                )
-            ).action as VideoTagging).tag
+            (
+                terry.receiveSlack(
+                    BlockActions(
+                        actions = listOf(
+                            BlockAction(
+                                selectedOption = BlockActionSelectedOption("""{"code":"british-english","entryId":"a_Kaltura1D"}""")
+                            )
+                        ),
+                        channel = BlockActionIdentifiable(id = "#legacyOrderDocuments"),
+                        user = BlockActionIdentifiable(id = "THAD666"),
+                        responseUrl = "https://response.to.me/please"
+                    )
+                ).action as VideoTagging
+                ).tag
         ).isEqualTo("caption48british")
     }
 
@@ -503,18 +519,20 @@ class TerryTests {
 
     @Test
     fun `successful transcript request triggers a chat message with the entry ID of the video`() {
-        when (val action = terry.receiveSlack(
-            BlockActions(
-                actions = listOf(
-                    BlockAction(
-                        selectedOption = BlockActionSelectedOption("""{"code":"british-english","entryId":"a_Kaltura1D"}""")
-                    )
-                ),
-                channel = BlockActionIdentifiable(id = "#legacyOrderDocuments"),
-                user = BlockActionIdentifiable(id = "THAD666"),
-                responseUrl = "https://my.response.url"
-            )
-        ).action) {
+        when (
+            val action = terry.receiveSlack(
+                BlockActions(
+                    actions = listOf(
+                        BlockAction(
+                            selectedOption = BlockActionSelectedOption("""{"code":"british-english","entryId":"a_Kaltura1D"}""")
+                        )
+                    ),
+                    channel = BlockActionIdentifiable(id = "#legacyOrderDocuments"),
+                    user = BlockActionIdentifiable(id = "THAD666"),
+                    responseUrl = "https://my.response.url"
+                )
+            ).action
+        ) {
             is VideoTagging ->
                 assertThat(action.onComplete(Success(entryId = "interviewWithOasis")))
                     .isEqualTo(
@@ -533,18 +551,20 @@ class TerryTests {
 
     @Test
     fun `failed transcript request triggers a chat message`() {
-        when (val action = terry.receiveSlack(
-            BlockActions(
-                actions = listOf(
-                    BlockAction(
-                        selectedOption = BlockActionSelectedOption("""{"code":"british-english","entryId":"a_Kaltura1D"}""")
-                    )
-                ),
-                channel = BlockActionIdentifiable(id = "#legacyOrderDocuments"),
-                user = BlockActionIdentifiable(id = "THAD666"),
-                responseUrl = "http://hit.me.up"
-            )
-        ).action) {
+        when (
+            val action = terry.receiveSlack(
+                BlockActions(
+                    actions = listOf(
+                        BlockAction(
+                            selectedOption = BlockActionSelectedOption("""{"code":"british-english","entryId":"a_Kaltura1D"}""")
+                        )
+                    ),
+                    channel = BlockActionIdentifiable(id = "#legacyOrderDocuments"),
+                    user = BlockActionIdentifiable(id = "THAD666"),
+                    responseUrl = "http://hit.me.up"
+                )
+            ).action
+        ) {
             is VideoTagging ->
                 assertThat(action.onComplete(Failure(entryId = "interviewWithBlur", error = "Kaltura fail")))
                     .isEqualTo(

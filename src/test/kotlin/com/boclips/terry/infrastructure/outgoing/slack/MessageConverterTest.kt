@@ -146,14 +146,16 @@ class MessageConverterTest {
                 )
             )
         ).let { converted ->
-            assertThat(converted.blocks.mapNotNull {
-                when (it) {
-                    is SlackViewSection ->
-                        it.accessory?.type
-                    SlackViewDivider ->
-                        null
+            assertThat(
+                converted.blocks.mapNotNull {
+                    when (it) {
+                        is SlackViewSection ->
+                            it.accessory?.type
+                        SlackViewDivider ->
+                            null
+                    }
                 }
-            }).doesNotContain("static_select")
+            ).doesNotContain("static_select")
         }
     }
 }

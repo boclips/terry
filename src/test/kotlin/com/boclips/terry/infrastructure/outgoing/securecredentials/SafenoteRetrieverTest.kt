@@ -1,7 +1,7 @@
 package com.boclips.terry.infrastructure.outgoing.securecredentials
 
-import com.boclips.terry.infrastructure.outgoing.rawcredentials.RawCredential
 import com.boclips.terry.infrastructure.outgoing.rawcredentials.FakeRawCredentialRetriever
+import com.boclips.terry.infrastructure.outgoing.rawcredentials.RawCredential
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test

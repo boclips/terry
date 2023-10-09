@@ -29,7 +29,10 @@ class SlackSignatureTests {
     @Test
     fun `own signature succeeds`() {
         assertAll(
-            Gen.string(), Gen.string(), Gen.nats(), Gen.string()
+            Gen.string(),
+            Gen.string(),
+            Gen.nats(),
+            Gen.string()
         ) { version: String, secretKey: String, sigTime: Int, body: String ->
             with(SlackSignature(version, secretKey.toByteArray())) {
                 verify(
@@ -47,7 +50,11 @@ class SlackSignatureTests {
     @Test
     fun `late verification of own signature fails`() {
         assertAll(
-            Gen.string(), Gen.string(), Gen.nats(), Gen.string(), Gen.nats()
+            Gen.string(),
+            Gen.string(),
+            Gen.nats(),
+            Gen.string(),
+            Gen.nats()
         ) { version: String, secretKey: String, sigTime: Int, body: String, timeoutSeconds: Int ->
             with(SlackSignature(version, secretKey.toByteArray(), signatureTimeoutSeconds = timeoutSeconds)) {
                 verify(

@@ -51,8 +51,6 @@ class AWSStorageRepositoryContractTest : StorageRepositoryTest() {
         newBucketName = "test-test-testing"
         storageRepository!!.delete(newBucketName!!)
     }
-
-
 }
 
 class FakeStorageRepositoryContractTest : StorageRepositoryTest() {

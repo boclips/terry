@@ -62,13 +62,15 @@ abstract class SlackPosterTests {
 
     @Test
     fun `failures produce PostFailures`() {
-        when (val response = poster!!.chatPostMessage(
-            SlackMessage(
-                text = "I hope this won't work",
-                channel = "#terry-test-output"
-            ),
-            url = "https://httpbin.org/status/401"
-        )) {
+        when (
+            val response = poster!!.chatPostMessage(
+                SlackMessage(
+                    text = "I hope this won't work",
+                    channel = "#terry-test-output"
+                ),
+                url = "https://httpbin.org/status/401"
+            )
+        ) {
             is PostSuccess ->
                 fail<String>("Expected post to Slack to fail, but it was successful: $response")
             is PostFailure ->

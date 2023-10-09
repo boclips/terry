@@ -64,7 +64,6 @@ class SlackSignatureValidatorFilter(val slackSignature: SlackSignature, val cloc
 
                 Verified ->
                     chain.doFilter(wrapper, response)
-
             }
         } ?: chain.doFilter(wrapper, response)
     }

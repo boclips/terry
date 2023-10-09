@@ -11,7 +11,7 @@ import com.boclips.terry.infrastructure.outgoing.slack.SlackMessage
 import org.springframework.stereotype.Component
 
 @Component
-class GimmeSafenoteForChannel: WhatToDo {
+class GimmeSafenoteForChannel : WhatToDo {
     override fun isMe(event: SlackEvent): Boolean {
         return extractSafenoteChannelName(event) != null
     }
@@ -48,7 +48,7 @@ class GimmeSafenoteForChannel: WhatToDo {
     }
 
     private fun extractSafenoteChannelName(event: SlackEvent): String? {
-       return extractChannelName(event.text, """.*safenote(?: for)? ([a-z0-9-_ ]+).*""")
+        return extractChannelName(event.text, """.*safenote(?: for)? ([a-z0-9-_ ]+).*""")
     }
 
     private fun extractChannelName(text: String, pattern: String): String? =

@@ -9,7 +9,6 @@ abstract class PolicyRepositoryContractTest {
     var bucketName: String? = null
     var newPolicyArn: String? = null
 
-
     @Test
     fun `can create and delete a policy for accessing given storage with arn`() {
         newPolicyArn = policyRepository!!.createOrGet("boclips-upload-test")
@@ -22,7 +21,6 @@ abstract class PolicyRepositoryContractTest {
     fun `gets a policy if it exists already`() {
         assertThat(policyRepository!!.createOrGet("my-test-policy1")).startsWith("arn:")
     }
-
 }
 
 class AWSPolicyRepositoryTest : PolicyRepositoryContractTest() {
@@ -32,7 +30,6 @@ class AWSPolicyRepositoryTest : PolicyRepositoryContractTest() {
         policyRepository = IamPolicyRepository()
         policyRepository!!.createOrGet("my-test-policy1")
     }
-
 }
 
 class FakePolicyRepositoryTest : PolicyRepositoryContractTest() {

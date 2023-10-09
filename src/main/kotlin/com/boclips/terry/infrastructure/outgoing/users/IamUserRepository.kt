@@ -3,7 +3,11 @@ package com.boclips.terry.infrastructure.outgoing.users
 import com.amazonaws.auth.EnvironmentVariableCredentialsProvider
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.identitymanagement.AmazonIdentityManagementClientBuilder
-import com.amazonaws.services.identitymanagement.model.*
+import com.amazonaws.services.identitymanagement.model.AttachUserPolicyRequest
+import com.amazonaws.services.identitymanagement.model.CreateUserRequest
+import com.amazonaws.services.identitymanagement.model.DetachUserPolicyRequest
+import com.amazonaws.services.identitymanagement.model.EntityAlreadyExistsException
+import com.amazonaws.services.identitymanagement.model.GetUserRequest
 
 class IamUserRepository : UserRepository {
     private val iam = AmazonIdentityManagementClientBuilder

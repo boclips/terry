@@ -7,9 +7,6 @@ import com.boclips.videos.api.response.HateoasLink
 import com.boclips.videos.api.response.video.VideoResource
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import feign.FeignException.NotFound
-import feign.Request
-import feign.Request.HttpMethod
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
@@ -66,7 +63,7 @@ class HTTPVideoServiceTest {
                         id = "lzzI",
                         _links = mapOf(
                             "thumbnail" to HateoasLink("https://avenue-video/thumbnail")
-                        ),
+                        )
                     ),
                     _links = null
                 )

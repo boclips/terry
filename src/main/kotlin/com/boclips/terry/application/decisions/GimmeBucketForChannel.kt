@@ -12,7 +12,7 @@ import com.boclips.terry.infrastructure.outgoing.slack.SlackMessage
 import org.springframework.stereotype.Component
 
 @Component
-class GimmeBucketForChannel: WhatToDo {
+class GimmeBucketForChannel : WhatToDo {
     override fun isMe(event: SlackEvent): Boolean {
         return extractChannelCreationChannelName(event) != null
     }
@@ -33,7 +33,7 @@ class GimmeBucketForChannel: WhatToDo {
                 ChatReply(
                     slackMessage = SlackMessage(
                         text = text,
-                        channel = event.channel,
+                        channel = event.channel
                     )
                 )
             }
@@ -52,5 +52,4 @@ class GimmeBucketForChannel: WhatToDo {
             ?.lowercase()
             ?.replace(" please.*$".toRegex(), "")
             ?.replace(" ", "-")
-
 }

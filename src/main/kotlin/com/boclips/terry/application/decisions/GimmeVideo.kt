@@ -14,7 +14,7 @@ import com.boclips.terry.infrastructure.outgoing.videos.MissingVideo
 import org.springframework.stereotype.Component
 
 @Component
-class GimmeVideo: WhatToDo {
+class GimmeVideo : WhatToDo {
     override fun isMe(event: SlackEvent): Boolean {
         return extractVideoId(event) != null
     }

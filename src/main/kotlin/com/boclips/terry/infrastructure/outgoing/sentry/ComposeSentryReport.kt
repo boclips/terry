@@ -36,7 +36,6 @@ class ComposeSentryReport(private val sentryClient: SentryClient) {
 
             logger.info { "sentry report created in ${time.elapsed(MILLISECONDS)}ms" }
             SentryReportSuccessful(sentryIssuesForReport, params)
-
         } catch (exception: Exception) {
             logger.warn(exception) { "Composing sentry report failed! Creating report failure instead" }
             SentryReportFailure(exception.message)

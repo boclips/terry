@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 @Component
 class DunnoWhatToDo {
 
-    fun printHelp(event: SlackEvent) : Decision {
+    fun printHelp(event: SlackEvent): Decision {
         return Decision(
             log = "Responding via chat with \"${helpFor(event.user)}\"",
             action = ChatReply(

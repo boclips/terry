@@ -16,8 +16,9 @@ class MultiReadHttpServletRequest(request: HttpServletRequest) : HttpServletRequ
     private var cachedBytes: ByteArrayOutputStream? = null
 
     override fun getInputStream(): ServletInputStream {
-        if (cachedBytes == null)
+        if (cachedBytes == null) {
             cacheInputStream()
+        }
 
         return CachedServletInputStream()
     }
