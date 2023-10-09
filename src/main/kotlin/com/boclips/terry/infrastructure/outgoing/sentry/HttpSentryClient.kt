@@ -22,10 +22,11 @@ class HttpSentryClient(private val sentryProperties: SentryProperties) : SentryC
     override fun getProjects(params: SentryReportParams): List<SentryProject> {
         val response = httpClient.newCall(buildRequest(projectsUrl(params))).execute()
 
-        verifyResponseSuccessful(response)
+        if (!response.isSuccessful) {
+            throw SentryApiException("[${response.code}] Cannot fetch ${params.team} projects - ${response.message}")
+        }
 
         return mapper.readValue(response.body!!.string(), buildListTypeFor(SentryProject::class.java, mapper))
-
     }
 
     override fun getProjectIssues(project: SentryProject, params: SentryReportParams): List<SentryProjectIssue> {
@@ -33,7 +34,9 @@ class HttpSentryClient(private val sentryProperties: SentryProperties) : SentryC
 
         val response = httpClient.newCall(buildRequest(projectIssuesUrl(project, params))).execute()
 
-        verifyResponseSuccessful(response)
+        if (!response.isSuccessful) {
+            throw SentryApiException("[${response.code}] Cannot fetch issues for ${project.slug} - ${response.message}")
+        }
 
         return mapper.readValue(response.body!!.string(), buildListTypeFor(SentryProjectIssue::class.java, mapper))
     }
@@ -44,12 +47,6 @@ class HttpSentryClient(private val sentryProperties: SentryProperties) : SentryC
             .get()
             .addHeader("Authorization", "Bearer " + sentryProperties.token)
             .build()
-    }
-
-    private fun verifyResponseSuccessful(response: Response) {
-        if (!response.isSuccessful) {
-            throw SentryApiException(response.message)
-        }
     }
 
     private fun buildListTypeFor(type: Class<*>, mapper: ObjectMapper): CollectionType {
