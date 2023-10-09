@@ -23,7 +23,7 @@ class HttpSentryClient(private val sentryProperties: SentryProperties) : SentryC
             .build()
 
         return httpClient.newCall(request).execute().let { response ->
-            if (!response.isSuccessful) throw IOException("Sentry API call failed!")
+            if (!response.isSuccessful) throw IOException("Sentry API call failed [${response.code}] - cannot fetch ${params.team} projects")
 
             val mapper = ObjectMapper()
             return@let mapper.readValue<List<SentryProject>>(
@@ -46,7 +46,7 @@ class HttpSentryClient(private val sentryProperties: SentryProperties) : SentryC
             .build()
 
         return OkHttpClient().newCall(request).execute().let { response ->
-            if (!response.isSuccessful) throw IOException("Sentry API call failed!")
+            if (!response.isSuccessful) throw IOException("Sentry API call failed [${response.code}] - cannot fetch issues for ${project.slug}")
 
             val mapper = ObjectMapper()
             return@let mapper.readValue<List<SentryProjectIssue>>(
